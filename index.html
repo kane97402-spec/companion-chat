@@ -238,7 +238,9 @@ const portraitAliases={
  "Izuku Midoriya":["Deku","Izuku Midoriya"],
  "Monkey D. Luffy":["Luffy","Monkey D. Luffy"],
  "Satoru Gojo":["Gojo","Satoru Gojo"],
- "Zero Two":["Zero Two","002"]
+ "Zero Two":["Zero Two","002"],
+ "Hinata Hyuga":["Hinata Hyuga","Hinata Hyūga","Hyuga Hinata"],
+ "Levi Ackerman":["Levi Ackerman","Levi","Rivaille","Captain Levi"]
 };
 function portraitNorm(value){return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\([^)]*\)/g," ").replace(/[^a-z0-9]/g,"")}
 function portraitMatchScore(candidate,accepted){
