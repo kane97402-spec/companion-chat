@@ -33,6 +33,16 @@ function cleanText(value, max) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
+function modelText(result) {
+  if (typeof result === "string") return result;
+  if (typeof result?.response === "string") return result.response;
+  if (typeof result?.output_text === "string") return result.output_text;
+  const content = result?.choices?.[0]?.message?.content;
+  if (typeof content === "string") return content;
+  if (Array.isArray(content)) return content.map(part => part?.text || "").join("");
+  return result?.result?.response || "";
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
@@ -99,7 +109,7 @@ export default {
           max_tokens: 420,
           temperature: 0.75
         });
-        const reply = typeof result === "string" ? result : (result?.response || result?.output_text || "");
+        const reply = modelText(result);
         if (!reply) return json({ error: "The AI returned an empty response. Try again." }, 502, origin);
         return json({ reply: String(reply).slice(0, 7000) }, 200, origin);
       }
@@ -128,7 +138,7 @@ export default {
         max_tokens: 1150,
         temperature: 0.35
       });
-      let raw = typeof result === "string" ? result : (result?.response || result?.output_text || "");
+      let raw = modelText(result);
       raw = String(raw).trim().replace(/^\u0060\u0060\u0060(?:json)?\s*/i, "").replace(/\s*\u0060\u0060\u0060$/, "");
       let lesson;
       try { lesson = JSON.parse(raw); }
