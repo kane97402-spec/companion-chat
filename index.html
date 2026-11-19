@@ -231,27 +231,50 @@ const portraitAliases={
  "Kirito":["Kirito","Kazuto Kirigaya"],
  "Rem":["Rem","Rem (Re:Zero)"],
  "Guts":["Guts","Guts (Berserk)"],
- "Alya":["Alisa Mikhailovna Kujou","Alya"]
+ "Alya":["Alisa Mikhailovna Kujou","Alya"],
+ "Ryomen Sukuna":["Sukuna","Ryomen Sukuna"],
+ "Goku":["Son Goku","Goku"],
+ "Kyouko Hori":["Kyoko Hori","Kyouko Hori"],
+ "Izuku Midoriya":["Deku","Izuku Midoriya"],
+ "Monkey D. Luffy":["Luffy","Monkey D. Luffy"],
+ "Satoru Gojo":["Gojo","Satoru Gojo"],
+ "Zero Two":["Zero Two","002"]
 };
-function portraitNorm(value){return String(value||"").toLowerCase().replace(/\([^)]*\)/g," ").replace(/[^a-z0-9]/g,"")}
+function portraitNorm(value){return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\([^)]*\)/g," ").replace(/[^a-z0-9]/g,"")}
+function portraitMatchScore(candidate,accepted){
+ const name=portraitNorm(candidate);if(!name)return 0;
+ let score=0;
+ for(const raw of accepted){
+  const target=portraitNorm(raw);if(!target)continue;
+  if(name===target)return 100;
+  if(target.length>=5&&(name.endsWith(target)||name.startsWith(target)))score=Math.max(score,90);
+  const words=String(raw).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").match(/[a-z0-9]+/g)||[];
+  const nameWords=String(candidate).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").match(/[a-z0-9]+/g)||[];
+  if(words.length&&words.every(w=>nameWords.includes(w)))score=Math.max(score,85);
+ }
+ return score;
+}
 async function getPortrait(p){
- const terms=[...new Set([p.query,p.name,...(portraitAliases[p.name]||[])].filter(Boolean))];
- const accepted=new Set([p.name,p.query,...(portraitAliases[p.name]||[])].filter(Boolean).map(portraitNorm));
+ const aliases=portraitAliases[p.name]||[];
+ const terms=[...new Set([p.query,p.name,...aliases].filter(Boolean))];
+ const accepted=[p.name,p.query,...aliases].filter(Boolean);
  for(const term of terms){
   try{
-   const query="query ($search: String) { Page(page: 1, perPage: 10) { characters(search: $search) { name { full } image { large } } } }";
+   const query="query ($search: String) { Page(page: 1, perPage: 15) { characters(search: $search) { name { full alternative } image { large medium } } } }";
    const r=await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query,variables:{search:term}})});
    if(r.ok){
     const d=await r.json(),items=d.data?.Page?.characters||[];
-    const match=items.find(c=>accepted.has(portraitNorm(c.name?.full)));
-    if(match?.image?.large)return match.image.large;
+    const ranked=items.map(c=>({c,score:Math.max(portraitMatchScore(c.name?.full,accepted),...(c.name?.alternative||[]).map(n=>portraitMatchScore(n,accepted)))})).sort((a,b)=>b.score-a.score);
+    const match=ranked.find(x=>x.score>=85)?.c;
+    const url=match?.image?.large||match?.image?.medium;if(url)return url;
    }
   }catch(e){}
   try{
-   const r=await fetch("https://api.jikan.moe/v4/characters?q="+encodeURIComponent(term)+"&limit=10");
+   const r=await fetch("https://api.jikan.moe/v4/characters?q="+encodeURIComponent(term)+"&limit=15");
    if(r.ok){
     const d=await r.json(),items=d.data||[];
-    const match=items.find(x=>[x.name,...(x.nicknames||[])].some(n=>accepted.has(portraitNorm(n))));
+    const ranked=items.map(x=>({x,score:Math.max(portraitMatchScore(x.name,accepted),...(x.nicknames||[]).map(n=>portraitMatchScore(n,accepted)))})).sort((a,b)=>b.score-a.score);
+    const match=ranked.find(x=>x.score>=85)?.x;
     const url=match?.images?.webp?.image_url||match?.images?.jpg?.image_url;
     if(url)return url;
    }
@@ -263,7 +286,7 @@ function setAvatar(el,p){
  el.innerHTML="";
  let f=document.createElement("span");f.className="avatar-fallback";f.textContent=initials(p.name);f.hidden=true;
  let img=document.createElement("img");img.alt=p.name+" portrait";img.hidden=true;
- img.onerror=()=>{img.hidden=true;f.hidden=false};
+ img.onerror=()=>{img.hidden=true;f.hidden=false;if(!img.dataset.retried){img.dataset.retried="1";delete portraitCache[p.name];queue.push({p,img,f,force:true});processQueue()}};
  el.append(img,f);
  if(portraitCache[p.name]){img.src=portraitCache[p.name];img.hidden=false}
  else{queue.push({p,img,f});processQueue()}
@@ -271,7 +294,8 @@ function setAvatar(el,p){
 async function processQueue(){
  if(busy)return;busy=true;
  while(queue.length){
-  const {p,img,f}=queue.shift();
+  const {p,img,f,force}=queue.shift();
+  if(force)delete portraitCache[p.name];
   if(!portraitCache[p.name]){
    const url=await getPortrait(p);
    if(url){portraitCache[p.name]=url;try{localStorage.setItem("companion_portraits_v3",JSON.stringify(portraitCache))}catch(e){}}
@@ -280,11 +304,11 @@ async function processQueue(){
    if(portraitCache[p.name]){img.src=portraitCache[p.name];img.hidden=false;f.hidden=true}
    else{img.hidden=true;f.hidden=false}
   }
-  await new Promise(resolve=>setTimeout(resolve,1300));
+  await new Promise(resolve=>setTimeout(resolve,450));
  }
  busy=false;
 }
-function renderPicker(){let q=$("characterSearch").value.toLowerCase(),grid=$("characterGrid");grid.innerHTML="";let matches=characters.filter(p=>(group==="Favorites"?favorites.includes(p.name):p.group===group)&&(!q||(p.name+" "+p.anime).toLowerCase().includes(q)));if(!matches.length){let empty=document.createElement("p");empty.className="study-intro";empty.textContent=group==="Favorites"?"No favorites yet. Use the star on a character card to add one.":"No characters match your search.";grid.append(empty)}matches.forEach(p=>{let b=document.createElement("button");b.className="character-card";let img=document.createElement("img");img.alt=p.name+" portrait";img.hidden=true;let f=document.createElement("div");f.className="portrait-fallback";f.textContent=initials(p.name);f.setAttribute("aria-hidden","true");if(portraitCache[p.name]){img.src=portraitCache[p.name];img.hidden=false;f.hidden=true}else{queue.push({p,img,f});processQueue()}img.onerror=()=>{img.hidden=true;f.hidden=false};let n=document.createElement("strong");n.textContent=p.name;let a=document.createElement("small");a.textContent=p.anime;let star=document.createElement("span");star.className="favorite-star";star.setAttribute("role","button");star.setAttribute("tabindex","0");star.textContent=favorites.includes(p.name)?"★":"☆";star.title=favorites.includes(p.name)?"Remove from favorites":"Add to favorites";star.onclick=e=>{e.stopPropagation();favorites=favorites.includes(p.name)?favorites.filter(x=>x!==p.name):[...favorites,p.name];localStorage.setItem("companion_favorites_v1",JSON.stringify(favorites));renderPicker();renderQuickTabs()};star.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();star.onclick(e)}};b.append(img,f,n,a,star);b.onclick=()=>choose(p.name);grid.append(b)})}
+function renderPicker(){let q=$("characterSearch").value.toLowerCase(),grid=$("characterGrid");grid.innerHTML="";let matches=characters.filter(p=>(group==="Favorites"?favorites.includes(p.name):p.group===group)&&(!q||(p.name+" "+p.anime).toLowerCase().includes(q)));if(!matches.length){let empty=document.createElement("p");empty.className="study-intro";empty.textContent=group==="Favorites"?"No favorites yet. Use the star on a character card to add one.":"No characters match your search.";grid.append(empty)}matches.forEach(p=>{let b=document.createElement("button");b.className="character-card";let img=document.createElement("img");img.alt=p.name+" portrait";img.hidden=true;let f=document.createElement("div");f.className="portrait-fallback";f.textContent=initials(p.name);f.setAttribute("aria-hidden","true");if(portraitCache[p.name]){img.src=portraitCache[p.name];img.hidden=false;f.hidden=true}else{queue.push({p,img,f});processQueue()}img.onerror=()=>{img.hidden=true;f.hidden=false;if(!img.dataset.retried){img.dataset.retried="1";delete portraitCache[p.name];queue.push({p,img,f,force:true});processQueue()}};let n=document.createElement("strong");n.textContent=p.name;let a=document.createElement("small");a.textContent=p.anime;let star=document.createElement("span");star.className="favorite-star";star.setAttribute("role","button");star.setAttribute("tabindex","0");star.textContent=favorites.includes(p.name)?"★":"☆";star.title=favorites.includes(p.name)?"Remove from favorites":"Add to favorites";star.onclick=e=>{e.stopPropagation();favorites=favorites.includes(p.name)?favorites.filter(x=>x!==p.name):[...favorites,p.name];localStorage.setItem("companion_favorites_v1",JSON.stringify(favorites));renderPicker();renderQuickTabs()};star.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();star.onclick(e)}};b.append(img,f,n,a,star);b.onclick=()=>choose(p.name);grid.append(b)})}
 function choose(name){let p=characters.find(x=>x.name===name);if(!p)return;activeCharacter=p;let c=chats.find(x=>x.character===name);if(!c){c={id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),character:name,title:"",mode:"Conversation",messages:[],updated:Date.now()};chats.unshift(c)}activeChatId=c.id;mode=c.mode||"Conversation";c.updated=Date.now();persist();updateHeader();renderMessages();renderHistory();renderQuickTabs();setModes();updateComposerAction();document.querySelectorAll(".nav-link").forEach(b=>b.classList.toggle("active",b.id==="navRecent"));$("messageInput").disabled=false;$("sendButton").disabled=false;$("messageInput").placeholder="Message "+name+"…";$("welcomeTitle").textContent="Say hello to "+name+"."; $("welcomeText").textContent=p.bio;close("pickerOverlay");$("sidebar").classList.remove("open");renderMessages();if(!c.messages.length){$("messageInput").placeholder="Start a conversation with "+name+"…";$("messageInput").focus()}}
 function updateHeader(){if(!activeCharacter)return;$("topName").textContent=activeCharacter.name;$("topSub").textContent=activeCharacter.anime;setAvatar($("topAvatar"),activeCharacter);}
 function renderHistory(){let el=$("history"),q=$("historySearch").value.toLowerCase();renderRecentCharacters();renderQuickTabs();el.innerHTML="";let list=chats.filter(c=>(c.character+" "+(c.title||"")).toLowerCase().includes(q)).slice(0,50);if(!list.length){el.innerHTML='<div class="empty-history">No matching conversations yet.</div>';return}list.forEach(c=>{let b=document.createElement("button");b.className="history-item"+(c.id===activeChatId?" active":"");let d=document.createElement("span");d.className="hist-dot";let n=document.createElement("span");n.className="hist-name";n.textContent=c.title||c.character;let more=document.createElement("span");more.className="more";more.textContent="⋯";b.append(d,n,more);b.onclick=()=>activateChat(c.id);more.onclick=e=>{e.stopPropagation();activateChat(c.id);open("optionsOverlay")};el.append(b)})}
