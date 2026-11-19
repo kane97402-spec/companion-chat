@@ -239,7 +239,7 @@ const portraitAliases={
  "Monkey D. Luffy":["Luffy","Monkey D. Luffy"],
  "Satoru Gojo":["Gojo","Satoru Gojo"],
  "Zero Two":["Zero Two","002"],
- "Hinata Hyuga":["Hinata Hyuga","Hinata Hyūga","Hyuga Hinata"],
+ "Hinata Hyuga":["Hinata Hyuga","Hinata Hyūga","Hinata Hyuuga","Hyuga Hinata","Hinata Hyuuga","日向ヒナタ"],
  "Levi Ackerman":["Levi Ackerman","Levi","Rivaille","Captain Levi"]
 };
 function portraitNorm(value){return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\([^)]*\)/g," ").replace(/[^a-z0-9]/g,"")}
@@ -292,13 +292,15 @@ async function getPortrait(p){
  // fail to resolve consistently. Kitsu exposes character artwork through its
  // public JSON:API; keep exact-name matching to avoid assigning the wrong person.
  if(p.name==="Hinata Hyuga"||p.name==="Levi Ackerman"){
-  const shortName=p.name==="Hinata Hyuga"?"Hinata":"Levi";
-  const kitsu=await portraitFetch("https://kitsu.io/api/edge/characters?filter[name]="+encodeURIComponent(shortName)+"&page[limit]=20");
-  const entries=kitsu?.data||[];
-  const ranked=entries.map(entry=>({entry,score:portraitMatchScore(entry.attributes?.name,accepted)})).sort((a,b)=>b.score-a.score);
-  const match=ranked.find(item=>item.score>=85)?.entry;
-  const image=match?.attributes?.image?.original||match?.attributes?.image?.large||match?.attributes?.image?.tiny;
-  if(image)return image;
+  const kitsuTerms=p.name==="Hinata Hyuga"?["Hinata Hyuga","Hinata Hyuuga","日向ヒナタ"]:["Levi Ackerman","Levi"];
+  for(const term of kitsuTerms){
+   const kitsu=await portraitFetch("https://kitsu.app/api/edge/characters?filter[name]="+encodeURIComponent(term)+"&page[limit]=20",{headers:{"Accept":"application/vnd.api+json"}});
+   const entries=kitsu?.data||[];
+   const ranked=entries.map(entry=>({entry,score:portraitMatchScore(entry.attributes?.name,accepted)})).sort((a,b)=>b.score-a.score);
+   const match=ranked.find(item=>item.score>=85)?.entry;
+   const image=match?.attributes?.image?.original||match?.attributes?.image?.large||match?.attributes?.image?.tiny;
+   if(image)return image;
+  }
  }
  return "";
 }
