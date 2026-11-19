@@ -288,6 +288,18 @@ async function getPortrait(p){
   const jUrl=jMatch?.images?.webp?.image_url||jMatch?.images?.jpg?.image_url;
   if(jUrl)return jUrl;
  }
+ // Last-resort character-image source for the two profiles that some catalogs
+ // fail to resolve consistently. Kitsu exposes character artwork through its
+ // public JSON:API; keep exact-name matching to avoid assigning the wrong person.
+ if(p.name==="Hinata Hyuga"||p.name==="Levi Ackerman"){
+  const shortName=p.name==="Hinata Hyuga"?"Hinata":"Levi";
+  const kitsu=await portraitFetch("https://kitsu.io/api/edge/characters?filter[name]="+encodeURIComponent(shortName)+"&page[limit]=20");
+  const entries=kitsu?.data||[];
+  const ranked=entries.map(entry=>({entry,score:portraitMatchScore(entry.attributes?.name,accepted)})).sort((a,b)=>b.score-a.score);
+  const match=ranked.find(item=>item.score>=85)?.entry;
+  const image=match?.attributes?.image?.original||match?.attributes?.image?.large||match?.attributes?.image?.tiny;
+  if(image)return image;
+ }
  return "";
 }
 function setAvatar(el,p){
