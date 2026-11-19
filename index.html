@@ -225,6 +225,9 @@ function initials(n){return n.split(" ").map(x=>x[0]).slice(0,2).join("")}
 function chatNow(){return chats.find(c=>c.id===activeChatId)}
 function open(id){$(id).classList.add("open")}function close(id){$(id).classList.remove("open")}
 const portraitCache=load("companion_portraits_v3",load("companion_portraits_v2",load("companion_portraits_v1",{})));
+// User-provided portrait override for Hinata Hyuga.
+portraitCache["Hinata Hyuga"]="https://i.redd.it/ekqv9107qp8a1.jpg";
+try{localStorage.setItem("companion_portraits_v3",JSON.stringify(portraitCache))}catch(e){}
 const queue=[];let busy=false;
 const portraitAliases={
  "L Lawliet":["L","L Lawliet"],
