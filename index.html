@@ -224,26 +224,37 @@ function toast(s){$("toast").textContent=s;$("toast").classList.add("show");clea
 function initials(n){return n.split(" ").map(x=>x[0]).slice(0,2).join("")}
 function chatNow(){return chats.find(c=>c.id===activeChatId)}
 function open(id){$(id).classList.add("open")}function close(id){$(id).classList.remove("open")}
-const portraitCache=load("companion_portraits_v2",{});
+const portraitCache=load("companion_portraits_v3",{});
 const queue=[];let busy=false;
 const portraitAliases={
  "L Lawliet":["L","L Lawliet"],
  "Kirito":["Kirito","Kazuto Kirigaya"],
  "Rem":["Rem","Rem (Re:Zero)"],
- "Guts":["Guts","Guts (Berserk)"]
+ "Guts":["Guts","Guts (Berserk)"],
+ "Alya":["Alisa Mikhailovna Kujou","Alya"]
 };
-function portraitNorm(value){return String(value||"").toLowerCase().replace(/\([^)]*\)/g," ").replace(/[^a-z0-9]/g,"")}
+function portraitNorm(value){return String(value||"").toLowerCase().replace(/\\([^)]*\\)/g," ").replace(/[^a-z0-9]/g,"")}
 async function getPortrait(p){
  const terms=[...new Set([p.query,p.name,...(portraitAliases[p.name]||[])].filter(Boolean))];
- const accepted=new Set([p.name,...(portraitAliases[p.name]||[])].map(portraitNorm));
+ const accepted=new Set([p.name,p.query,...(portraitAliases[p.name]||[])].filter(Boolean).map(portraitNorm));
  for(const term of terms){
   try{
-   const r=await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query:"query ($search: String) { Character(search: $search) { name { full } image { large } } }",variables:{search:term}})});
-   if(r.ok){const d=await r.json(),c=d.data?.Character,name=portraitNorm(c?.name?.full);if(c?.image?.large&&accepted.has(name))return c.image.large}
+   const query="query ($search: String) { Page(page: 1, perPage: 10) { characters(search: $search) { nodes { name { full } image { large } } } } }";
+   const r=await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query,variables:{search:term}})});
+   if(r.ok){
+    const d=await r.json(),items=d.data?.Page?.characters?.nodes||[];
+    const match=items.find(c=>accepted.has(portraitNorm(c.name?.full)));
+    if(match?.image?.large)return match.image.large;
+   }
   }catch(e){}
   try{
    const r=await fetch("https://api.jikan.moe/v4/characters?q="+encodeURIComponent(term)+"&limit=10");
-   if(r.ok){const d=await r.json(),items=d.data||[],match=items.find(x=>[x.name,...(x.nicknames||[])].some(n=>accepted.has(portraitNorm(n))));const url=match?.images?.webp?.image_url||match?.images?.jpg?.image_url;if(url)return url}
+   if(r.ok){
+    const d=await r.json(),items=d.data||[];
+    const match=items.find(x=>[x.name,...(x.nicknames||[])].some(n=>accepted.has(portraitNorm(n))));
+    const url=match?.images?.webp?.image_url||match?.images?.jpg?.image_url;
+    if(url)return url;
+   }
   }catch(e){}
  }
  return "";
@@ -263,13 +274,13 @@ async function processQueue(){
   const {p,img,f}=queue.shift();
   if(!portraitCache[p.name]){
    const url=await getPortrait(p);
-   if(url){portraitCache[p.name]=url;try{localStorage.setItem("companion_portraits_v2",JSON.stringify(portraitCache))}catch(e){}}
+   if(url){portraitCache[p.name]=url;try{localStorage.setItem("companion_portraits_v3",JSON.stringify(portraitCache))}catch(e){}}
   }
   if(img.isConnected){
    if(portraitCache[p.name]){img.src=portraitCache[p.name];img.hidden=false;f.hidden=true}
    else{img.hidden=true;f.hidden=false}
   }
-  await new Promise(resolve=>setTimeout(resolve,700));
+  await new Promise(resolve=>setTimeout(resolve,1300));
  }
  busy=false;
 }
