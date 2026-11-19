@@ -217,4 +217,65 @@ let theme=load("companion_theme","dark");setTheme(theme);showHome();renderHistor
 @media(max-width:780px){.content.chat-start{justify-content:center}.content.chat-start .composer-wrap{margin:auto auto 12px}.content.chat-start .mode-strip{grid-template-columns:repeat(3,minmax(0,1fr))}}
 body[data-theme="light"] .attach{background:#f0eafa;color:#654b8e;border-color:#d5c5ed}
 body[data-theme="light"] .attachment-chip{background:#f6f2fb;color:#514064;border-color:#d5c5ed}
+
+/* Refined first-message composer: compact, centered, and visually light */
+.content.chat-start .composer-wrap{
+  width:min(620px,100%);
+  max-width:620px;
+  align-self:center;
+  margin:auto;
+  padding:12px 0 18px;
+}
+.content.chat-start .mode-strip{
+  justify-content:center;
+  gap:4px;
+  padding:0 0 7px;
+}
+.content.chat-start .mode{
+  padding:4px 8px;
+  font-size:10px;
+  border:0;
+  background:transparent;
+  border-radius:999px;
+}
+.content.chat-start .mode.active{
+  background:#ffffff0b;
+  color:#e7dcff;
+  border:0;
+}
+.content.chat-start .composer{
+  padding:8px 10px;
+  gap:7px;
+  border:0;
+  border-radius:14px;
+  background:#1b1a23a6;
+  box-shadow:none;
+}
+.content.chat-start .composer:focus-within{
+  border:0;
+  box-shadow:0 0 0 1px #806bb655;
+}
+.content.chat-start .composer textarea{
+  min-height:32px;
+  max-height:100px;
+  font-size:14px;
+  padding:4px 0;
+}
+.content.chat-start .attach,
+.content.chat-start .mic,
+.content.chat-start .send{
+  width:34px;
+  height:34px;
+  border-radius:10px;
+}
+@media(max-width:780px){
+  .content.chat-start .composer-wrap{
+    width:100%;
+    max-width:620px;
+    align-self:center;
+    margin:auto;
+  }
+  .content.chat-start .mode-strip{justify-content:center}
+}
+
 </style>
