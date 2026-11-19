@@ -367,6 +367,8 @@ async function sendMessage(text,skipUser=false){
  pendingAttachments=[];renderAttachmentList();
  if(!c.title&&c.messages.filter(x=>x.role==="user").length===1)c.title=clean.slice(0,34)+(clean.length>34?"…":"");
  c.updated=Date.now();persist();$("messageInput").value="";resize();renderMessages();renderHistory();
+ const gojoPrompt=clean.toLowerCase().replace(/[^a-z0-9 ]/g,"").replace(/\s+/g," ").trim();
+ if(p==="Satoru Gojo"&&gojoPrompt==="if sukuna regained all his strength would you lose"&&!attachments.length){const reply="Nah I’d win";c.messages.push({role:"assistant",text:reply,at:Date.now()});c.updated=Date.now();persist();renderMessages();renderHistory();if(voiceOn)speak(reply);return}
  const endpoint=aiEndpoint();if(!endpoint){toast("Add your free AI Worker URL in About & privacy to enable AI chat.");return}
  let pending=document.createElement("div");pending.className="typing";pending.textContent=p+" is thinking…";
  if(activeChatId===c.id){$("messages").append(pending);$("messages").scrollTop=$("messages").scrollHeight}
