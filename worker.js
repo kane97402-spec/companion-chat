@@ -106,8 +106,9 @@ export default {
         ].join("\n");
         const result = await env.AI.run(MODEL, {
           messages: [{ role: "system", content: system }, ...messages],
-          max_tokens: 420,
-          temperature: 0.75
+          max_completion_tokens: 420,
+          temperature: 0.75,
+          chat_template_kwargs: { enable_thinking: false, clear_thinking: true }
         });
         const reply = modelText(result);
         if (!reply) return json({ error: "The AI returned an empty response. Try again." }, 502, origin);
