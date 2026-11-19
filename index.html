@@ -254,31 +254,37 @@ function portraitMatchScore(candidate,accepted){
  }
  return score;
 }
+async function portraitFetch(url,options){
+ for(let attempt=0;attempt<3;attempt++){
+  try{
+   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
+   const response=await fetch(url,{...options,signal:controller.signal});
+   clearTimeout(timer);
+   if(response.status===429||response.status>=500){if(attempt<2){await new Promise(resolve=>setTimeout(resolve,1800*(attempt+1)));continue}}
+   if(!response.ok)return null;
+   return await response.json();
+  }catch(e){if(attempt===2)return null;await new Promise(resolve=>setTimeout(resolve,900*(attempt+1)))}
+ }
+ return null;
+}
 async function getPortrait(p){
  const aliases=portraitAliases[p.name]||[];
- const terms=[...new Set([p.query,p.name,...aliases].filter(Boolean))];
- const accepted=[p.name,p.query,...aliases].filter(Boolean);
+ const terms=[...new Set([p.name,...aliases,p.query].filter(Boolean))];
+ const accepted=[p.name,...aliases,p.query].filter(Boolean);
  for(const term of terms){
-  try{
-   const query="query ($search: String) { Page(page: 1, perPage: 15) { characters(search: $search) { name { full alternative } image { large medium } } } }";
-   const r=await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query,variables:{search:term}})});
-   if(r.ok){
-    const d=await r.json(),items=d.data?.Page?.characters||[];
-    const ranked=items.map(c=>({c,score:Math.max(portraitMatchScore(c.name?.full,accepted),...(c.name?.alternative||[]).map(n=>portraitMatchScore(n,accepted)))})).sort((a,b)=>b.score-a.score);
-    const match=ranked.find(x=>x.score>=85)?.c;
-    const url=match?.image?.large||match?.image?.medium;if(url)return url;
-   }
-  }catch(e){}
-  try{
-   const r=await fetch("https://api.jikan.moe/v4/characters?q="+encodeURIComponent(term)+"&limit=15");
-   if(r.ok){
-    const d=await r.json(),items=d.data||[];
-    const ranked=items.map(x=>({x,score:Math.max(portraitMatchScore(x.name,accepted),...(x.nicknames||[]).map(n=>portraitMatchScore(n,accepted)))})).sort((a,b)=>b.score-a.score);
-    const match=ranked.find(x=>x.score>=85)?.x;
-    const url=match?.images?.webp?.image_url||match?.images?.jpg?.image_url;
-    if(url)return url;
-   }
-  }catch(e){}
+  const query="query ($search: String) { Page(page: 1, perPage: 20) { characters(search: $search) { name { full alternative } image { large medium } } } }";
+  const d=await portraitFetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query,variables:{search:term}})});
+  const items=d?.data?.Page?.characters||[];
+  const ranked=items.map(c=>({c,score:Math.max(portraitMatchScore(c.name?.full,accepted),...(c.name?.alternative||[]).map(n=>portraitMatchScore(n,accepted)))})).sort((a,b)=>b.score-a.score);
+  const match=ranked.find(x=>x.score>=85)?.c;
+  const url=match?.image?.large||match?.image?.medium;if(url)return url;
+  await new Promise(resolve=>setTimeout(resolve,350));
+  const j=await portraitFetch("https://api.jikan.moe/v4/characters?q="+encodeURIComponent(term)+"&limit=15");
+  const jItems=j?.data||[];
+  const jRanked=jItems.map(x=>({x,score:Math.max(portraitMatchScore(x.name,accepted),...(x.nicknames||[]).map(n=>portraitMatchScore(n,accepted)))})).sort((a,b)=>b.score-a.score);
+  const jMatch=jRanked.find(x=>x.score>=85)?.x;
+  const jUrl=jMatch?.images?.webp?.image_url||jMatch?.images?.jpg?.image_url;
+  if(jUrl)return jUrl;
  }
  return "";
 }
@@ -304,7 +310,7 @@ async function processQueue(){
    if(portraitCache[p.name]){img.src=portraitCache[p.name];img.hidden=false;f.hidden=true}
    else{img.hidden=true;f.hidden=false}
   }
-  await new Promise(resolve=>setTimeout(resolve,450));
+  await new Promise(resolve=>setTimeout(resolve,1250));
  }
  busy=false;
 }
