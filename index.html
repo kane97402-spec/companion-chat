@@ -266,8 +266,8 @@ function renderPicker(){
  });
 }
 function setMode(next){mode=next;const chat=currentChat();if(chat){chat.mode=next;save()}setModeButtons();toast(next+" mode selected")}
-function demoReply(text){
- const n=activeCharacter?.name||"Your companion",m=mode;
+function demoReply(text, characterName, selectedMode){
+ const n=characterName||"Your companion",m=selectedMode||"Conversation";
  if(m==="Study")return "Let's work through it together. Tell me what part is confusing, and I'll break it into manageable steps.\n\n(Study-mode demo reply — connect an AI service to get real answers.)";
  if(m==="Productivity")return "Let's make a simple plan. What's the one thing you'd like to get done first?\n\n(Productivity-mode demo reply — connect an AI service for real assistance.)";
  if(m==="Learning")return "That's a good topic to explore. We can start with the basics, then build up one idea at a time.\n\n(Learning-mode demo reply — connect an AI service for real explanations.)";
@@ -277,9 +277,11 @@ function demoReply(text){
 }
 function sendMessage(text){
  const clean=text.trim(),chat=currentChat();if(!clean||!chat)return;
- chat.messages.push({role:"user",text:clean,at:Date.now()});chat.updated=Date.now();chat.mode=mode;save();$("messageInput").value="";resizeInput();renderMessages();renderHistory();
- const typing=document.createElement("div");typing.className="typing";typing.textContent=activeCharacter.name+" is typing…";$("messages").appendChild(typing);$("messages").scrollTop=$("messages").scrollHeight;
- setTimeout(()=>{typing.remove();const reply=demoReply(clean);chat.messages.push({role:"assistant",text:reply,at:Date.now()});chat.updated=Date.now();save();renderMessages();renderHistory();if(voiceOn)speak(reply)},650);
+ const characterName=chat.character,selectedMode=chat.mode||mode;
+ chat.messages.push({role:"user",text:clean,at:Date.now()});chat.updated=Date.now();chat.mode=selectedMode;save();$("messageInput").value="";resizeInput();renderMessages();renderHistory();
+ const typing=document.createElement("div");typing.className="typing";typing.textContent=characterName+" is typing…";
+ if(activeChatId===chat.id){$("messages").appendChild(typing);$("messages").scrollTop=$("messages").scrollHeight}
+ setTimeout(()=>{typing.remove();const reply=demoReply(clean,characterName,selectedMode);chat.messages.push({role:"assistant",text:reply,at:Date.now()});chat.updated=Date.now();save();if(activeChatId===chat.id){renderMessages();renderHistory();if(voiceOn)speak(reply)}else{renderHistory()}},650);
 }
 function resizeInput(){const x=$("messageInput");x.style.height="auto";x.style.height=Math.min(x.scrollHeight,130)+"px"}
 function speak(text){if(!("speechSynthesis" in window)){toast("Read-aloud is not supported in this browser.");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=1;u.pitch=1;speechSynthesis.speak(u)}
