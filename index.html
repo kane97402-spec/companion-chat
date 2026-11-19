@@ -84,6 +84,43 @@ body[data-theme="light"] .mode{background:#fff;border-color:#e5deeb;color:#675e7
 @media(max-width:780px){.character-quickbar{height:54px;padding:0 12px;gap:8px}.quickbar-label{display:none}.plans-grid{grid-template-columns:1fr}.plan-card p{min-height:0}.side-nav{gap:1px}.side-nav .side-link{min-height:35px}.app{min-height:100dvh;height:100dvh}}
 @media(max-width:480px){.home-dashboard{grid-template-columns:1fr}.home-tile.featured{grid-column:auto}.quick-character{padding-right:8px}.quick-character .avatar{width:24px;height:24px}.quick-character span:last-child{max-width:65px;overflow:hidden;text-overflow:ellipsis}.plans-grid{padding-left:14px;padding-right:14px}}
 body[data-theme="light"] .character-quickbar{background:#fff;border-color:var(--line)}body[data-theme="light"] .quick-character{background:#f7f4fb;color:#50445f;border-color:var(--line)}body[data-theme="light"] .quick-character.active{background:#eee7f8;border-color:#a58bcf}body[data-theme="light"] .plan-card{background:#fff;border-color:var(--line);color:#342d41}body[data-theme="light"] .plan-card ul{color:#514b5e}body[data-theme="light"] .account-plan-row{background:#f3edf9;border-color:#d5c5ed}body[data-theme="light"] .side-nav .side-link.active{background:#eee7f8;border-color:#d5c5ed;color:#533c7b}
+
+/* Softer chat-message proportions and a fully rounded composer */
+.message{
+  width:fit-content;
+  padding:9px 15px;
+  border-radius:23px;
+  font-size:14px;
+  line-height:1.5;
+  box-shadow:0 4px 16px #00000012;
+}
+.message.user{border-bottom-right-radius:8px}
+.message.assistant{border-bottom-left-radius:8px}
+.speaker{font-size:10px;margin-bottom:2px;line-height:1.25}
+.msgtext{font-size:14px;line-height:1.5}
+.composer{
+  min-height:48px;
+  padding:5px 7px 5px 18px;
+  border-radius:999px;
+  gap:8px;
+}
+.composer textarea{
+  min-height:28px;
+  max-height:120px;
+  padding:5px 0;
+  line-height:1.5;
+}
+.send,.mic{
+  width:36px;
+  height:36px;
+  flex:0 0 36px;
+  border-radius:50%;
+}
+@media(max-width:780px){
+  .message{max-width:91%;padding:9px 14px;border-radius:22px}
+  .composer{min-height:46px;padding:5px 6px 5px 15px}
+  .send,.mic{width:34px;height:34px;flex-basis:34px}
+}
 </style>
 </head>
 <body>
