@@ -121,6 +121,27 @@ body[data-theme="light"] .character-quickbar{background:#fff;border-color:var(--
   .composer{min-height:46px;padding:5px 6px 5px 15px}
   .send,.mic{width:34px;height:34px;flex-basis:34px}
 }
+
+.lesson-presenter{display:flex;align-items:center;gap:14px;padding:13px 16px;margin:18px 0 8px;border:1px solid #ffffff20;border-radius:18px;background:#ffffff0a}
+.lesson-presenter-avatar{width:66px;height:66px;flex:0 0 66px;display:grid;place-items:center;overflow:hidden;border-radius:20px;background:linear-gradient(145deg,#b69bff55,#6e4e9855);border:1px solid #cbb5ff66;transition:transform .25s ease;box-shadow:0 5px 18px #0002}
+.lesson-presenter-avatar img{width:100%;height:100%;object-fit:cover}
+.lesson-presenter-fallback{font-weight:800;font-size:20px;color:#e6d9ff}
+.lesson-presenter-avatar.speaking{animation:teacher-bob .9s ease-in-out infinite alternate;box-shadow:0 0 0 4px #b69bff22,0 0 26px #b69bff55}
+.lesson-presenter-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.lesson-presenter-copy strong{font-size:14px}
+.lesson-presenter-copy>span{font-size:9px;letter-spacing:1.5px;font-weight:800;color:#cbb8e9}
+.lesson-voice-wave{display:flex;align-items:center;gap:3px;height:15px;margin-top:3px;opacity:.35}
+.lesson-voice-wave i{display:block;width:3px;height:5px;border-radius:9px;background:#c7aaff}
+.lesson-voice-wave.active{opacity:1}
+.lesson-voice-wave.active i{animation:voice-wave .55s ease-in-out infinite alternate}
+.lesson-voice-wave.active i:nth-child(2){animation-delay:.12s}.lesson-voice-wave.active i:nth-child(3){animation-delay:.22s}.lesson-voice-wave.active i:nth-child(4){animation-delay:.08s}.lesson-voice-wave.active i:nth-child(5){animation-delay:.18s}
+.voice-preview-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px}
+.voice-preview-row .study-intro{margin:0}
+@keyframes teacher-bob{from{transform:translateY(0) rotate(-1deg)}to{transform:translateY(-5px) rotate(1deg)}}
+@keyframes voice-wave{from{height:4px}to{height:14px}}
+body[data-theme="light"] .lesson-presenter{border-color:#d8cce8;background:#ffffff99}
+@media(max-width:560px){.voice-preview-row{align-items:flex-start;flex-direction:column}.lesson-presenter{padding:11px}.lesson-presenter-avatar{width:58px;height:58px;flex-basis:58px}}
+
 </style>
 </head>
 <body>
@@ -254,32 +275,138 @@ function renderQuiz(el){el.innerHTML='<p class="study-intro">Create a quick mult
 function showQuiz(){let area=$("quizArea");if(!quizState)return;if(quizState.index>=quizState.questions.length){area.innerHTML='<div class="study-card"><h3>Quiz complete</h3><p>You selected the strongest study approach '+quizState.score+' out of '+quizState.questions.length+' times.</p><p class="study-intro">This template quiz checks general study reasoning, not detailed subject knowledge.</p><button class="primary" id="againQuiz">Create another quiz</button></div>';$("againQuiz").onclick=()=>renderStudy();return}let q=quizState.questions[quizState.index];area.innerHTML='<div class="study-card"><p class="study-intro">Question '+(quizState.index+1)+' of '+quizState.questions.length+'</p><h3></h3><div class="answer-list" id="quizOptions"></div><div id="quizFeedback"></div><div class="modal-actions"><button class="primary" id="nextQuiz" disabled>Next question</button></div></div>';area.querySelector("h3").textContent=q.q;let opts=$("quizOptions");q.opts.forEach((o,i)=>{let b=document.createElement("button");b.className="answer-option";b.textContent=o;b.onclick=()=>{if(quizState.answers[quizState.index]!==undefined)return;quizState.answers[quizState.index]=i;if(i===q.a)quizState.score++;opts.querySelectorAll("button").forEach((x,j)=>{x.disabled=true;if(j===q.a)x.classList.add("selected")});$("quizFeedback").innerHTML='<div class="feedback">'+(i===q.a?"Correct — ":"Not quite. ")+q.why+'</div>';$("nextQuiz").disabled=false};opts.append(b)});$("nextQuiz").onclick=()=>{quizState.index++;showQuiz()}}
 function renderPractice(el){el.innerHTML='<p class="study-intro">A simple one-question-at-a-time practice prompt. Type your answer, then compare it with a useful checklist.</p><label class="field"><span>Topic or skill</span><input id="practiceTopic" placeholder="e.g. causes of imperialism"></label><button class="primary" id="startPractice">Start practice</button><div id="practiceArea"></div>';$("startPractice").onclick=()=>{let t=$("practiceTopic").value.trim();if(!t){toast("Enter a topic first.");return}$("practiceArea").innerHTML='<div class="study-card"><h3>Explain this in your own words:</h3><p></p><label class="field"><span>Your answer</span><textarea id="practiceAnswer" placeholder="Write what you know…"></textarea></label><button class="primary" id="checkPractice">Review my answer</button><div id="practiceFeedback"></div></div>';$("practiceArea").querySelector("p").textContent="What is one important idea about "+t+", and why does it matter?";$("checkPractice").onclick=()=>{let a=$("practiceAnswer").value.trim();if(!a){toast("Write an answer first.");return}$("practiceFeedback").innerHTML='<div class="feedback"><strong>Self-check:</strong> Did you define the idea, include a specific detail or example, and explain why it matters? This browser-only tool cannot reliably grade subject accuracy without AI or an answer key.</div>'}}}
 function renderFlashcards(el){el.innerHTML='<p class="study-intro">Make your own flashcards and flip through them. Cards are saved in this browser.</p><label class="field"><span>Front / question</span><input id="cardFront" placeholder="Term or question"></label><label class="field"><span>Back / answer</span><textarea id="cardBack" placeholder="Definition or explanation"></textarea></label><button class="primary" id="addCard">Save flashcard</button><div id="flashArea"></div>'; $("addCard").onclick=()=>{let f=$("cardFront").value.trim(),b=$("cardBack").value.trim();if(!f||!b){toast("Add both a front and a back.");return}studySets.push({front:f,back:b});persist();flashIndex=studySets.length-1;flashBack=false;renderFlashcards($("studyBody"))};let area=$("flashArea");if(!studySets.length){area.innerHTML='<p class="study-intro">No cards yet. Add your first one above.</p>';return}flashIndex=Math.min(flashIndex,studySets.length-1);let card=document.createElement("div");card.className="study-card flashcard";let p=document.createElement("div");p.textContent=flashBack?studySets[flashIndex].back:studySets[flashIndex].front;let small=document.createElement("small");small.textContent="Click card to flip · "+(flashIndex+1)+" of "+studySets.length; p.append(small);card.append(p);card.onclick=()=>{flashBack=!flashBack;renderFlashcards($("studyBody"))};area.append(card);let actions=document.createElement("div");actions.className="modal-actions";let prev=document.createElement("button");prev.className="secondary";prev.textContent="Previous";prev.onclick=()=>{flashIndex=(flashIndex-1+studySets.length)%studySets.length;flashBack=false;renderFlashcards($("studyBody"))};let next=document.createElement("button");next.className="secondary";next.textContent="Next";next.onclick=()=>{flashIndex=(flashIndex+1)%studySets.length;flashBack=false;renderFlashcards($("studyBody"))};let del=document.createElement("button");del.className="secondary";del.textContent="Delete card";del.onclick=()=>{studySets.splice(flashIndex,1);persist();renderFlashcards($("studyBody"))};actions.append(prev,next,del);area.append(actions)}
+const lessonVoiceOptions = [
+ {value:"luna",label:"Luna"},{value:"athena",label:"Athena"},{value:"asteria",label:"Asteria"},
+ {value:"hera",label:"Hera"},{value:"callista",label:"Callista"},{value:"thalia",label:"Thalia"},
+ {value:"phoebe",label:"Phoebe"},{value:"orion",label:"Orion"},{value:"orpheus",label:"Orpheus"},
+ {value:"atlas",label:"Atlas"},{value:"draco",label:"Draco"},{value:"jupiter",label:"Jupiter"}
+];
+let lessonVoices=load("companion_lesson_voices_v1",{});
+function defaultLessonVoice(name){
+ const key=String(name||"companion.");
+ const score=[...key].reduce((sum,ch)=>sum+ch.charCodeAt(0),0);
+ return lessonVoiceOptions[score%lessonVoiceOptions.length].value;
+}
 function renderVideo(el){
- el.innerHTML='<p class="study-intro">Create a short animated lesson from any topic. AI writes the storyboard; companion presents it as timed slides with optional browser narration. This free version does not create cinematic footage or export MP4 files.</p><label class="field"><span>Lesson topic</span><input id="videoTopic" placeholder="e.g. Cellular respiration"></label><label class="field"><span>Class notes (optional)</span><textarea id="videoNotes" placeholder="Paste notes or key ideas to guide the lesson…"></textarea></label><label class="field"><span>Lesson length</span><select id="videoSlides"><option value="3">Quick · 3 scenes</option><option value="4" selected>Standard · 4 scenes</option><option value="5">Detailed · 5 scenes</option><option value="6">Extended · 6 scenes</option></select></label><button class="primary" id="makeVideo">✧ Generate animated lesson</button><div id="videoResult"></div>';
- $("makeVideo").onclick=async()=>{const topic=$("videoTopic").value.trim(),notes=$("videoNotes").value.trim(),endpoint=aiEndpoint(),btn=$("makeVideo");if(!topic){toast("Enter a lesson topic first.");return}if(!endpoint){toast("Add your free AI Worker URL in About & privacy first.");return}btn.disabled=true;btn.textContent="Creating your lesson…";try{const response=await fetch(endpoint+"/lesson",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({topic,notes,slides:Number($("videoSlides").value)})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||"Lesson generation failed.");if(!data.lesson?.slides?.length)throw new Error("The AI did not return a usable lesson.");showLessonPlayer($("videoResult"),data.lesson)}catch(error){toast(error.message||"Could not create the lesson.")}finally{btn.disabled=false;btn.textContent="✧ Generate animated lesson"}};
+ const options=lessonVoiceOptions.map(v=>'<option value="'+v.value+'">'+v.label+'</option>').join("");
+ el.innerHTML='<p class="study-intro">Create a narrated anime-style study lesson. Your selected character becomes the teacher, with an original AI voice and an animated presenter. Free Cloudflare AI usage limits apply.</p><label class="field"><span>Lesson topic</span><input id="videoTopic" placeholder="e.g. Cellular respiration"></label><label class="field"><span>Class notes (optional)</span><textarea id="videoNotes" placeholder="Paste notes or key ideas to guide the lesson…"></textarea></label><label class="field"><span>Lesson length</span><select id="videoSlides"><option value="3">Quick · 3 scenes</option><option value="4" selected>Standard · 4 scenes</option><option value="5">Detailed · 5 scenes</option><option value="6">Extended · 6 scenes</option></select></label><label class="field"><span>Teacher voice</span><select id="videoVoice">'+options+'</select></label><div class="voice-preview-row"><span class="study-intro">Choose a voice and preview it before generating.</span><button class="secondary" id="previewLessonVoice" type="button">▶ Preview voice</button></div><button class="primary" id="makeVideo">✧ Generate animated lesson</button><div id="videoResult"></div>';
+ const teacherName=activeCharacter?.name||"companion.";
+ const voiceSelect=$("videoVoice");
+ voiceSelect.value=lessonVoices[teacherName]||defaultLessonVoice(teacherName);
+ voiceSelect.onchange=()=>{lessonVoices[teacherName]=voiceSelect.value;try{localStorage.setItem("companion_lesson_voices_v1",JSON.stringify(lessonVoices))}catch{}};
+ $("previewLessonVoice").onclick=async()=>{
+  const btn=$("previewLessonVoice"),endpoint=aiEndpoint(),voice=voiceSelect.value;
+  if(!endpoint){toast("Add your Cloudflare Worker URL in About & privacy first.");return}
+  btn.disabled=true;btn.textContent="Loading voice…";
+  try{
+   const response=await fetch(endpoint+"/speak",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:"Hello! I'm here to guide you through today's lesson. Let's break this topic down together.",speaker:voice})});
+   if(!response.ok){const data=await response.json().catch(()=>({}));throw new Error(data.error||"Voice preview failed.")}
+   const url=URL.createObjectURL(await response.blob()),audio=new Audio(url);
+   audio.onended=()=>URL.revokeObjectURL(url);audio.onerror=()=>URL.revokeObjectURL(url);
+   await audio.play();
+  }catch(error){toast(error.message||"Could not preview this voice.")}
+  finally{btn.disabled=false;btn.textContent="▶ Preview voice"}
+ };
+ $("makeVideo").onclick=async()=>{
+  const topic=$("videoTopic").value.trim(),notes=$("videoNotes").value.trim(),endpoint=aiEndpoint(),btn=$("makeVideo");
+  if(!topic){toast("Enter a lesson topic first.");return}
+  if(!endpoint){toast("Add your free AI Worker URL in About & privacy first.");return}
+  const teacher=activeCharacter?{name:activeCharacter.name,anime:activeCharacter.anime,bio:activeCharacter.bio,query:activeCharacter.query}:{name:"companion.",anime:"",bio:"A clear, encouraging study guide.",query:""};
+  lessonVoices[teacher.name]=voiceSelect.value;
+  try{localStorage.setItem("companion_lesson_voices_v1",JSON.stringify(lessonVoices))}catch{}
+  btn.disabled=true;btn.textContent="Creating your lesson…";
+  try{
+   const response=await fetch(endpoint+"/lesson",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({topic,notes,slides:Number($("videoSlides").value),character:teacher})});
+   const data=await response.json().catch(()=>({}));
+   if(!response.ok)throw new Error(data.error||"Lesson generation failed.");
+   if(!data.lesson?.slides?.length)throw new Error("The AI did not return a usable lesson.");
+   showLessonPlayer($("videoResult"),data.lesson,teacher,voiceSelect.value);
+  }catch(error){toast(error.message||"Could not create the lesson.")}
+  finally{btn.disabled=false;btn.textContent="✧ Generate animated lesson"}
+ };
 }
 let lessonState=null,lessonTimer=null;
-function stopLessonPlayback(){if(lessonTimer)clearTimeout(lessonTimer);lessonTimer=null;if("speechSynthesis"in window)speechSynthesis.cancel();if(lessonState)lessonState.playing=false}
-function showLessonPlayer(host,lesson){stopLessonPlayback();lessonState={lesson,index:0,playing:false};renderLessonSlide(host)}
+function stopLessonPlayback(){
+ if(lessonTimer)clearTimeout(lessonTimer);lessonTimer=null;
+ if(lessonState){
+  lessonState.playing=false;lessonState.audioRequest=(lessonState.audioRequest||0)+1;
+  if(lessonState.audio){lessonState.audio.pause();lessonState.audio.onended=null;lessonState.audio=null}
+  if(lessonState.audioUrl){URL.revokeObjectURL(lessonState.audioUrl);lessonState.audioUrl=null}
+ }
+ if("speechSynthesis"in window)speechSynthesis.cancel();
+}
+function showLessonPlayer(host,lesson,teacher,voice){
+ stopLessonPlayback();
+ lessonState={lesson,teacher:teacher||{name:"companion.",bio:""},voice:voice||"luna",index:0,playing:false,audio:null,audioUrl:null,audioRequest:0,usedFallback:false};
+ renderLessonSlide(host);
+}
 function renderLessonSlide(host){
- if(!lessonState)return;const {lesson,index,playing}=lessonState,slide=lesson.slides[index];host.innerHTML="";
+ if(!lessonState)return;
+ const {lesson,index,playing,teacher}=lessonState,slide=lesson.slides[index];
+ host.innerHTML="";
  const card=document.createElement("div");card.className="study-card lesson-player";
- const top=document.createElement("div");top.className="lesson-topline";const count=document.createElement("span");count.textContent="SCENE "+(index+1)+" / "+lesson.slides.length;
- const progress=document.createElement("div");progress.className="lesson-progress";const fill=document.createElement("span");fill.style.width=((index+1)/lesson.slides.length*100)+"%";progress.append(fill);top.append(count,progress);
+ const top=document.createElement("div");top.className="lesson-topline";
+ const count=document.createElement("span");count.textContent="SCENE "+(index+1)+" / "+lesson.slides.length;
+ const progress=document.createElement("div");progress.className="lesson-progress";
+ const fill=document.createElement("span");fill.style.width=((index+1)/lesson.slides.length*100)+"%";progress.append(fill);top.append(count,progress);
  const sub=document.createElement("p");sub.className="study-intro";sub.textContent=lesson.title+" · "+(lesson.subtitle||"A short animated lesson");
+ const presenter=document.createElement("div");presenter.className="lesson-presenter";
+ const avatar=document.createElement("div");avatar.className="lesson-presenter-avatar"+(playing?" speaking":"");
+ const portrait=document.createElement("img");portrait.alt=teacher.name+" teacher portrait";portrait.hidden=true;
+ const fallback=document.createElement("span");fallback.className="lesson-presenter-fallback";fallback.textContent=teacher.name.split(" ").map(x=>x[0]).slice(0,2).join("");
+ avatar.append(portrait,fallback);
+ const presenterCopy=document.createElement("div");presenterCopy.className="lesson-presenter-copy";
+ const teacherName=document.createElement("strong");teacherName.textContent=teacher.name;
+ const teacherStatus=document.createElement("span");teacherStatus.textContent=playing?"TEACHING NOW":"YOUR TEACHER";
+ const wave=document.createElement("div");wave.className="lesson-voice-wave"+(playing?" active":"");
+ for(let i=0;i<5;i++){const bar=document.createElement("i");wave.append(bar)}
+ presenterCopy.append(teacherName,teacherStatus,wave);presenter.append(avatar,presenterCopy);
+ const cached=portraitCache[teacher.name];
+ if(cached){portrait.src=cached;portrait.hidden=false;fallback.hidden=true}
+ else if(teacher.query||teacher.name!=="companion."){
+  getPortrait(teacher).then(url=>{if(url&&portrait.isConnected){portrait.src=url;portrait.hidden=false;fallback.hidden=true}})
+ }
  const title=document.createElement("h3");title.className="lesson-title";title.textContent=slide.title;
  const narration=document.createElement("p");narration.className="lesson-narration";narration.textContent=slide.narration;
- const list=document.createElement("ul");list.className="lesson-bullets";slide.bullets.forEach(item=>{const li=document.createElement("li");li.textContent=item;list.append(li)});
+ const list=document.createElement("ul");list.className="lesson-bullets";
+ slide.bullets.forEach(item=>{const li=document.createElement("li");li.textContent=item;list.append(li)});
  const controls=document.createElement("div");controls.className="modal-actions lesson-controls";
- const previous=document.createElement("button");previous.className="secondary";previous.textContent="Previous";previous.disabled=index===0;previous.onclick=()=>{stopLessonPlayback();lessonState.index=Math.max(0,lessonState.index-1);renderLessonSlide(host)};
- const play=document.createElement("button");play.className="primary";play.textContent=playing?"Pause lesson":"▶ Play lesson";play.onclick=()=>{if(lessonState.playing){stopLessonPlayback();renderLessonSlide(host)}else{lessonState.playing=true;renderLessonSlide(host);speakLessonSlide(host)}};
- const next=document.createElement("button");next.className="secondary";next.textContent=index===lesson.slides.length-1?"Restart":"Next";next.onclick=()=>{stopLessonPlayback();lessonState.index=index===lesson.slides.length-1?0:index+1;renderLessonSlide(host)};
- controls.append(previous,play,next);card.append(top,sub,title,narration,list,controls);host.append(card);
+ const previous=document.createElement("button");previous.className="secondary";previous.textContent="Previous";previous.disabled=index===0;
+ previous.onclick=()=>{stopLessonPlayback();lessonState.index=Math.max(0,lessonState.index-1);renderLessonSlide(host)};
+ const play=document.createElement("button");play.className="primary";play.textContent=playing?"Pause lesson":"▶ Play lesson";
+ play.onclick=()=>{if(lessonState.playing){stopLessonPlayback();renderLessonSlide(host)}else{lessonState.playing=true;renderLessonSlide(host);speakLessonSlide(host)}};
+ const next=document.createElement("button");next.className="secondary";next.textContent=index===lesson.slides.length-1?"Restart":"Next";
+ next.onclick=()=>{stopLessonPlayback();lessonState.index=index===lesson.slides.length-1?0:index+1;renderLessonSlide(host)};
+ controls.append(previous,play,next);card.append(top,sub,presenter,title,narration,list,controls);host.append(card);
+}
+function advanceLessonSlide(host,state){
+ if(!lessonState||lessonState!==state||!state.playing)return;
+ if(state.audioUrl){URL.revokeObjectURL(state.audioUrl);state.audioUrl=null}
+ state.audio=null;
+ if(state.index>=state.lesson.slides.length-1){stopLessonPlayback();renderLessonSlide(host);toast("Lesson complete.");return}
+ state.index++;renderLessonSlide(host);state.playing=true;speakLessonSlide(host);
 }
 function speakLessonSlide(host){
- if(!lessonState||!lessonState.playing)return;const slide=lessonState.lesson.slides[lessonState.index];
- if("speechSynthesis"in window){speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance(slide.narration);utterance.rate=0.96;speechSynthesis.speak(utterance)}
- lessonTimer=setTimeout(()=>{if(!lessonState||!lessonState.playing)return;if("speechSynthesis"in window)speechSynthesis.cancel();if(lessonState.index>=lessonState.lesson.slides.length-1){stopLessonPlayback();renderLessonSlide(host);toast("Lesson complete.");return}lessonState.index++;renderLessonSlide(host);lessonState.playing=true;speakLessonSlide(host)},Math.max(8500,slide.narration.length*85));
+ const state=lessonState;if(!state||!state.playing)return;
+ const slide=state.lesson.slides[state.index],endpoint=aiEndpoint(),requestId=++state.audioRequest;
+ const fallback=()=>{
+  if(!lessonState||lessonState!==state||!state.playing||state.audioRequest!==requestId)return;
+  if(!("speechSynthesis"in window)){stopLessonPlayback();renderLessonSlide(host);toast("Audio playback is unavailable in this browser.");return}
+  if(!state.usedFallback){toast("Cloudflare voice is unavailable; using your browser voice for this lesson.");state.usedFallback=true}
+  const utterance=new SpeechSynthesisUtterance(slide.narration);utterance.rate=0.96;
+  utterance.onend=()=>advanceLessonSlide(host,state);state.utterance=utterance;speechSynthesis.cancel();speechSynthesis.speak(utterance);
+ };
+ if(!endpoint){fallback();return}
+ fetch(endpoint+"/speak",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:slide.narration,speaker:state.voice})})
+ .then(async response=>{if(!response.ok){const data=await response.json().catch(()=>({}));throw new Error(data.error||"Voice generation failed.")}return response.blob()})
+ .then(blob=>{
+  if(!lessonState||lessonState!==state||!state.playing||state.audioRequest!==requestId)return;
+  state.audioUrl=URL.createObjectURL(blob);state.audio=new Audio(state.audioUrl);
+  state.audio.onended=()=>advanceLessonSlide(host,state);
+  state.audio.onerror=fallback;
+  return state.audio.play();
+ })
+ .catch(()=>fallback());
 }
 function renderNotes(el){el.innerHTML='<p class="study-intro">Paste notes to make a clean outline, key-term list, and review checklist. Processing stays in your browser.</p><label class="field"><span>Paste your notes</span><textarea id="notesInput" placeholder="Paste class notes here…"></textarea></label><button class="primary" id="organizeNotes">Organize notes</button><div id="notesResult"></div>';$("organizeNotes").onclick=()=>{let raw=$("notesInput").value.trim();if(!raw){toast("Paste some notes first.");return}let lines=raw.split(/\n+/).map(x=>x.trim()).filter(Boolean),words=raw.match(/[A-Za-z][A-Za-z'-]{4,}/g)||[],freq={};words.forEach(w=>{let k=w.toLowerCase();freq[k]=(freq[k]||0)+1});let terms=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,8).map(x=>x[0]);let out=$("notesResult");out.innerHTML="";let card=document.createElement("div");card.className="study-card";let h=document.createElement("h3");h.textContent="Organized outline";let ul=document.createElement("ul");lines.slice(0,30).forEach(x=>{let li=document.createElement("li");li.textContent=x.replace(/^[-•*]\s*/,"");ul.append(li)});let h2=document.createElement("h3");h2.textContent="Repeated key terms";let p=document.createElement("p");p.textContent=terms.length?terms.join(" · "):"No repeated terms found.";let h3=document.createElement("h3");h3.textContent="Review checklist";let p2=document.createElement("p");p2.textContent="Can you explain each bullet without looking? Can you connect the ideas? Can you give one example?";card.append(h,ul,h2,p,h3,p2);out.append(card);let copy=document.createElement("button");copy.className="secondary";copy.textContent="Copy organized notes";copy.onclick=()=>navigator.clipboard?.writeText(lines.map(x=>"• "+x).join("\n")+"\n\nKey terms: "+terms.join(", ")).then(()=>toast("Copied")).catch(()=>toast("Clipboard unavailable"));out.append(copy)}}
 function setTheme(t){document.body.dataset.theme=t;try{localStorage.setItem("companion_theme",t)}catch{}$("themeToggle").textContent=t==="light"?"☾":"☼"}
