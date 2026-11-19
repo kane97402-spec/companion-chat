@@ -224,7 +224,7 @@ function toast(s){$("toast").textContent=s;$("toast").classList.add("show");clea
 function initials(n){return n.split(" ").map(x=>x[0]).slice(0,2).join("")}
 function chatNow(){return chats.find(c=>c.id===activeChatId)}
 function open(id){$(id).classList.add("open")}function close(id){$(id).classList.remove("open")}
-const portraitCache=load("companion_portraits_v3",{});
+const portraitCache=load("companion_portraits_v3",load("companion_portraits_v2",load("companion_portraits_v1",{})));
 const queue=[];let busy=false;
 const portraitAliases={
  "L Lawliet":["L","L Lawliet"],
@@ -239,10 +239,10 @@ async function getPortrait(p){
  const accepted=new Set([p.name,p.query,...(portraitAliases[p.name]||[])].filter(Boolean).map(portraitNorm));
  for(const term of terms){
   try{
-   const query="query ($search: String) { Page(page: 1, perPage: 10) { characters(search: $search) { nodes { name { full } image { large } } } } }";
+   const query="query ($search: String) { Page(page: 1, perPage: 10) { characters(search: $search) { name { full } image { large } } } }";
    const r=await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query,variables:{search:term}})});
    if(r.ok){
-    const d=await r.json(),items=d.data?.Page?.characters?.nodes||[];
+    const d=await r.json(),items=d.data?.Page?.characters||[];
     const match=items.find(c=>accepted.has(portraitNorm(c.name?.full)));
     if(match?.image?.large)return match.image.large;
    }
