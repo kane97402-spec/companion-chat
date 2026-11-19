@@ -233,7 +233,7 @@ const portraitAliases={
  "Guts":["Guts","Guts (Berserk)"],
  "Alya":["Alisa Mikhailovna Kujou","Alya"]
 };
-function portraitNorm(value){return String(value||"").toLowerCase().replace(/\\([^)]*\\)/g," ").replace(/[^a-z0-9]/g,"")}
+function portraitNorm(value){return String(value||"").toLowerCase().replace(/\([^)]*\)/g," ").replace(/[^a-z0-9]/g,"")}
 async function getPortrait(p){
  const terms=[...new Set([p.query,p.name,...(portraitAliases[p.name]||[])].filter(Boolean))];
  const accepted=new Set([p.name,p.query,...(portraitAliases[p.name]||[])].filter(Boolean).map(portraitNorm));
