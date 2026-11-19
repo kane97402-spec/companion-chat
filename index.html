@@ -105,7 +105,7 @@ body[data-theme="light"] .character-quickbar{background:#fff;border-color:var(--
  <section class="content" id="content">
   <div class="welcome" id="welcome"><h1 id="welcomeTitle">A space to chat, learn, and create.</h1><p id="welcomeText">Choose a character to start. Your conversations stay separate, and the study tools work right in your browser.</p><div class="suggestions"><button class="suggestion" data-prompt="Tell me about yourself.">Meet your companion</button><button class="suggestion" data-prompt="Help me understand a topic I'm studying.">Start a study chat</button><button class="suggestion" data-action="study">Open study workspace</button></div><div class="home-dashboard"><button class="home-tile featured" data-action="study"><span class="tile-kicker">Your learning space</span><span class="tile-icon">✧</span><strong>Make progress on what you're learning</strong><small>Build quizzes, review flashcards, practice a topic, or organize your notes.</small></button><button class="home-tile" data-action="characters"><span class="tile-kicker">Find your voice</span><span class="tile-icon">◉</span><strong>Choose a character</strong><small>Browse anime companions and start a conversation.</small></button><button class="home-tile" data-action="recent"><span class="tile-kicker">Pick up where you left off</span><span class="tile-icon">↗</span><strong>Recent conversations</strong><small>Jump back into a chat you've already started.</small></button></div><div class="home-section-head"><strong>Recently active characters</strong><span>Quick access</span></div><div class="recent-character-row" id="recentCharacters"><span class="study-intro">Your characters will appear here as you chat.</span></div></div>
   <div class="messages" id="messages" hidden></div>
-  <div class="composer-wrap"><div class="mode-strip" id="modeStrip"><button class="mode active" data-mode="Conversation">◉ Conversation</button><button class="mode" data-mode="Study">▤ Study</button><button class="mode" data-mode="Entertainment">✧ Entertainment</button><button class="mode" data-mode="Productivity">✓ Productivity</button><button class="mode" data-mode="Learning">⌘ Learning</button><button class="mode" data-mode="Gaming">♟ Gaming</button></div><div class="composer"><button class="attach" id="attachButton" type="button" title="Attach files or pictures" aria-label="Attach files or pictures">＋</button><input id="fileInput" type="file" accept="image/*,.pdf,.txt,.doc,.docx,.ppt,.pptx,.xls,.xlsx" multiple hidden><textarea id="messageInput" rows="1" placeholder="Choose a character to start chatting…" disabled></textarea><button class="mic" id="micButton" title="Voice input" aria-label="Voice input">🎙</button><button class="send" id="sendButton" disabled aria-label="Send message">↑</button></div><div class="attachment-list" id="attachmentList" aria-live="polite"></div><div class="footnote" id="footnote">Demo chat only — no AI service is connected. Study tools run locally in your browser.</div></div>
+  <div class="composer-wrap"><div class="mode-strip" id="modeStrip"><button class="mode active" data-mode="Conversation">◉ Conversation</button><button class="mode" data-mode="Study">▤ Study</button><button class="mode" data-mode="Entertainment">✧ Entertainment</button><button class="mode" data-mode="Productivity">✓ Productivity</button><button class="mode" data-mode="Learning">⌘ Learning</button><button class="mode" data-mode="Gaming">♟ Gaming</button></div><div class="composer"><button class="attach" id="attachButton" type="button" title="Attach files or pictures" aria-label="Attach files or pictures">＋</button><input id="fileInput" type="file" accept="image/*,.pdf,.txt,.doc,.docx,.ppt,.pptx,.xls,.xlsx" multiple hidden><textarea id="messageInput" rows="1" placeholder="Choose a character to start chatting…" disabled></textarea><button class="mic" id="micButton" title="Voice input" aria-label="Voice input"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6.5 11.5a5.5 5.5 0 0 0 11 0M12 17v3.5M9 20.5h6M4.5 8.5l2 1.2M19.5 8.5l-2 1.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button><button class="send" id="sendButton" disabled aria-label="Send message"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="attachment-list" id="attachmentList" aria-live="polite"></div><div class="footnote" id="footnote">Demo chat only — no AI service is connected. Study tools run locally in your browser.</div></div>
  </section>
 </main>
 </div>
@@ -167,7 +167,50 @@ function regenerate(i){let c=chatNow();if(!c||c.messages[i]?.role!=="assistant")
 function setModes(){document.querySelectorAll(".mode").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode))}
 function setMode(m){mode=m;let c=chatNow();if(c){c.mode=m;persist()}setModes();toast(m+" mode selected")}
 function demoReply(text,person,m){let prefix={Conversation:"",Study:"Let's approach this like a study session. ",Learning:"Let's break the idea into clear steps. ",Productivity:"Let's turn that into a manageable plan. ",Entertainment:"Let's make this fun. ",Gaming:"Game time! "}[m]||"";let voice={ "Mai Sakurajima":"Mai: ", "Ichika Nakano":"Ichika: ", "Nino Nakano":"Nino: ", "Miku Nakano":"Miku: ", "Yotsuba Nakano":"Yotsuba: ", "Itsuki Nakano":"Itsuki: ", "Akari Watanabe":"Akari: ", "Marin Kitagawa":"Marin: ", "Zero Two":"Zero Two: ", "Alya":"Alya: ", "Satoru Gojo":"Gojo: ", "Ryomen Sukuna":"Sukuna: ", "Kakashi Hatake":"Kakashi: ", "Might Guy":"Guy: ", "Escanor":"Escanor: ", "Goku":"Goku: ", "Izuku Midoriya":"Midoriya: ", "Edward Elric":"Edward: "}[person]||person+": ";let body=m==="Study"?"Tell me the exact topic or question, and we can organize what you already know.":m==="Learning"?"Start with one question: what part do you want to understand first?":m==="Productivity"?"Write down the goal, the deadline, and the first small step. What are you working toward?":m==="Gaming"?"Pick a quick game: 20 questions, trivia, or word association.":m==="Entertainment"?"We could talk about a show, invent a story idea, or try a creative challenge.":"Thanks for telling me. What would you like to explore next?";return voice+prefix+body+"\n\n— Demo response. AI is not connected yet, so this is a sample interaction, not an AI-generated answer."}
-function sendMessage(text,skipUser=false){let clean=text.trim(),c=chatNow();if((!clean&&!pendingAttachments.length)||!c)return;let p=c.character,m=c.mode||mode,attachments=pendingAttachments.slice();if(!clean&&attachments.length)clean="Shared "+attachments.length+" attachment"+(attachments.length===1?"":"s")+". ";if(!skipUser)c.messages.push({role:"user",text:clean,attachments,at:Date.now()});pendingAttachments=[];renderAttachmentList();if(!c.title&&c.messages.filter(x=>x.role==="user").length===1)c.title=clean.slice(0,34)+(clean.length>34?"…":"");c.updated=Date.now();persist();$("messageInput").value="";resize();renderMessages();renderHistory();let pending=document.createElement("div");pending.className="typing";pending.textContent=p+" is preparing a demo reply…";if(activeChatId===c.id){$("messages").append(pending);$("messages").scrollTop=$("messages").scrollHeight}setTimeout(()=>{pending.remove();c.messages.push({role:"assistant",text:demoReply(clean,p,m),at:Date.now()});c.updated=Date.now();persist();if(activeChatId===c.id){renderMessages();renderHistory();if(voiceOn)speak(c.messages.at(-1).text)}else renderHistory()},450)}
+let pendingReply=null;
+function updateComposerAction(){
+ const btn=$("sendButton"),active=!!pendingReply&&pendingReply.chatId===activeChatId;
+ if(active){
+  btn.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+  btn.setAttribute("aria-label","Stop response");btn.title="Stop response";btn.classList.add("stopping");
+ }else{
+  btn.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  btn.setAttribute("aria-label","Send message");btn.title="Send message";btn.classList.remove("stopping");
+ }
+}
+function stopPendingReply(){
+ if(!pendingReply||pendingReply.chatId!==activeChatId)return;
+ clearTimeout(pendingReply.timer);
+ pendingReply.indicator?.remove();
+ pendingReply=null;
+ updateComposerAction();
+ toast("Response stopped");
+}
+function sendMessage(text,skipUser=false){
+ let clean=text.trim(),c=chatNow();
+ if((!clean&&!pendingAttachments.length)||!c)return;
+ if(pendingReply){clearTimeout(pendingReply.timer);pendingReply.indicator?.remove();pendingReply=null}
+ let p=c.character,m=c.mode||mode,attachments=pendingAttachments.slice();
+ if(!clean&&attachments.length)clean="Shared "+attachments.length+" attachment"+(attachments.length===1?"":"s")+". ";
+ if(!skipUser)c.messages.push({role:"user",text:clean,attachments,at:Date.now()});
+ pendingAttachments=[];renderAttachmentList();
+ if(!c.title&&c.messages.filter(x=>x.role==="user").length===1)c.title=clean.slice(0,34)+(clean.length>34?"…":"");
+ c.updated=Date.now();persist();$("messageInput").value="";resize();renderMessages();renderHistory();
+ let pending=document.createElement("div");pending.className="typing";pending.textContent=p+" is preparing a demo reply…";
+ if(activeChatId===c.id){$("messages").append(pending);$("messages").scrollTop=$("messages").scrollHeight}
+ const job={chatId:c.id,indicator:pending,timer:null};
+ job.timer=setTimeout(()=>{
+  pending.remove();
+  if(pendingReply!==job)return;
+  pendingReply=null;
+  c.messages.push({role:"assistant",text:demoReply(clean,p,m),at:Date.now()});
+  c.updated=Date.now();persist();
+  if(activeChatId===c.id){renderMessages();renderHistory();if(voiceOn)speak(c.messages.at(-1).text)}
+  else renderHistory();
+  updateComposerAction();
+ },450);
+ pendingReply=job;updateComposerAction();
+}
 function renderAttachmentList(){let el=$("attachmentList");if(!el)return;el.innerHTML="";pendingAttachments.forEach((a,i)=>{let item=document.createElement("span");item.className="attachment-chip";item.textContent=(a.type.startsWith("image/")?"▧ ":"📎 ")+a.name;let x=document.createElement("button");x.type="button";x.textContent="×";x.setAttribute("aria-label","Remove "+a.name);x.onclick=()=>{pendingAttachments.splice(i,1);renderAttachmentList()};item.append(x);el.append(item)})}
 async function addFiles(files){for(const file of Array.from(files)){if(pendingAttachments.length>=4){toast("You can attach up to 4 files at a time.");break}if(file.size>1800000){toast(file.name+" is too large. Choose a file under 1.8 MB.");continue}if(!(file.type.startsWith("image/")||["application/pdf","text/plain","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.ms-powerpoint","application/vnd.openxmlformats-officedocument.presentationml.presentation","application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"].includes(file.type))){toast(file.name+" is not a supported file type.");continue}let data=await new Promise((resolve,reject)=>{let reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)});pendingAttachments.push({name:file.name,type:file.type||"application/octet-stream",data});}renderAttachmentList()}
 function resize(){let x=$("messageInput");x.style.height="auto";x.style.height=Math.min(x.scrollHeight,135)+"px"}
@@ -343,4 +386,19 @@ body[data-theme="light"] .attachment-chip{background:#f6f2fb;color:#514064;borde
  .topbar{flex-basis:60px;height:60px;min-height:60px}
  .character-quickbar{flex-basis:44px;height:44px;min-height:44px;padding-left:13px;padding-right:13px}
 }
+
+/* Matching rose-pink line icons for voice, send, and stop */
+.composer .mic,.composer .send{
+ width:38px;height:38px;flex:none;display:grid;place-items:center;
+ padding:0;border:0;border-radius:11px;background:transparent;
+ color:#e6a0cf;box-shadow:none;transition:color .18s,background .18s,transform .18s;
+}
+.composer .mic:hover,.composer .send:hover{background:#e6a0cf12;color:#ffc0e3;transform:translateY(-1px)}
+.composer .mic svg,.composer .send svg{width:23px;height:23px;display:block}
+.composer .mic.listening{background:#e6a0cf18;color:#ffc0e3}
+.composer .send.stopping{color:#ffb3d9;background:#e6a0cf12}
+.composer .send.stopping svg{width:22px;height:22px}
+.content.chat-start .composer .mic,.content.chat-start .composer .send{width:34px;height:34px}
+body[data-theme="light"] .composer .mic,body[data-theme="light"] .composer .send{color:#b65f98}
+body[data-theme="light"] .composer .mic:hover,body[data-theme="light"] .composer .send:hover{background:#b65f9812;color:#994777}
 </style>
