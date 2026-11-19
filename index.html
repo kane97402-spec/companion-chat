@@ -1,316 +1,115 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#111018">
-<meta name="build-version" content="companion-rebuild-2026-11-18">
-<title>companion. — Character conversations</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111018">
+<title>companion. — Your character study space</title>
 <style>
-:root{color-scheme:dark;--bg:#101016;--panel:#181820;--panel2:#20202a;--line:#302e3a;--text:#f5f2fb;--muted:#a19cad;--purple:#b69bff;--purple2:#8b70d6;--soft:#2a2438}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}button,input,textarea{font:inherit}button{color:inherit;cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
-.app{height:100vh;min-height:560px;display:grid;grid-template-columns:260px 1fr;overflow:hidden}.sidebar{background:#15151c;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:20px 14px;min-width:0}.brand{display:flex;align-items:center;gap:10px;padding:0 8px 22px;font-size:19px;font-weight:800;letter-spacing:-.6px}.brand-mark{width:30px;height:30px;border-radius:11px;background:linear-gradient(135deg,#c2aaff,#7656c6);display:grid;place-items:center;color:#17121f;font-weight:900}.brand span:last-child{color:var(--purple)}.new-chat{width:100%;border:1px solid #514568;background:#282238;border-radius:12px;padding:11px 12px;text-align:left;display:flex;gap:10px;align-items:center;font-weight:650}.new-chat:hover{background:#332a47}.side-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:#817b8d;font-weight:750;padding:22px 9px 8px}.history{overflow:auto;flex:1}.history-item{width:100%;border:0;background:transparent;color:#c7c2d0;border-radius:9px;padding:9px 10px;text-align:left;display:flex;gap:9px;align-items:center;overflow:hidden}.history-item:hover,.history-item.active{background:#25232e;color:#fff}.history-item .hist-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-item .hist-dot{width:7px;height:7px;border-radius:50%;background:var(--purple);flex:none}.side-bottom{border-top:1px solid var(--line);padding-top:13px}.side-link{width:100%;border:0;background:none;color:var(--muted);padding:9px;text-align:left;border-radius:9px}.side-link:hover{background:#24232d;color:white}
-.main{min-width:0;display:flex;flex-direction:column;background:radial-gradient(ellipse at 50% -35%,#302641 0,transparent 48%),var(--bg)}.topbar{height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid #ffffff12;gap:14px}.character-trigger{border:1px solid var(--line);background:#1b1a23;border-radius:14px;padding:7px 12px;display:flex;align-items:center;gap:11px;min-width:190px;text-align:left}.character-trigger:hover{border-color:#665485}.avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#4c3a68,#282334);display:grid;place-items:center;font-weight:800;color:#e9ddff;flex:none}.character-meta{min-width:0}.character-meta strong{display:block;font-size:13px}.character-meta small{color:var(--muted);font-size:11px}.chevron{margin-left:auto;color:var(--muted)}.top-actions{display:flex;align-items:center;gap:8px}.pill{border:1px solid var(--line);background:#1a1921;border-radius:999px;padding:8px 12px;color:#c8c2d3;font-size:12px}.pill.active{border-color:#705a9b;background:#29233a;color:#e7dcff}.icon-btn{width:38px;height:38px;border:1px solid var(--line);background:#1a1921;border-radius:12px;display:grid;place-items:center;color:#c7c0d2}.icon-btn:hover{border-color:#6b568f;color:white}
-.chat-area{flex:1;min-height:0;display:flex;flex-direction:column;max-width:980px;width:100%;margin:0 auto;padding:0 28px}.welcome{margin:auto;text-align:center;max-width:570px;padding:30px 10px}.welcome-avatar{width:92px;height:92px;border-radius:50%;margin:0 auto 20px;display:grid;place-items:center;background:linear-gradient(135deg,#574477,#282235);border:2px solid #7f69a9;color:#f2eaff;font-size:30px;font-weight:800;box-shadow:0 0 55px #9b7be833;overflow:hidden}.welcome-avatar img{width:100%;height:100%;object-fit:cover}.welcome h1{font-size:27px;letter-spacing:-1px;margin:0 0 8px}.welcome p{color:var(--muted);margin:0 auto;max-width:460px}.suggestions{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;margin-top:24px}.suggestion{background:#1d1b26;border:1px solid #393345;border-radius:999px;padding:9px 13px;color:#d3c9e4;font-size:12px}.suggestion:hover{border-color:#8269b0;background:#282238}.messages{flex:1;overflow:auto;display:flex;flex-direction:column;gap:17px;padding:30px 2px 24px}.message{max-width:min(78%,680px);padding:13px 16px;border-radius:18px;white-space:pre-wrap;overflow-wrap:anywhere}.message.user{align-self:flex-end;background:linear-gradient(135deg,#7057a8,#594486);border-bottom-right-radius:5px}.message.assistant{align-self:flex-start;background:#211f29;border:1px solid #ffffff0c;border-bottom-left-radius:5px}.message .speaker{font-size:10px;color:#c8b6f0;font-weight:750;margin-bottom:4px}.message .body{font-size:14px}.typing{color:var(--muted);font-size:12px;padding:0 4px 10px}.composer-wrap{padding:12px 0 18px}.mode-strip{display:flex;gap:7px;overflow:auto;padding:0 2px 10px}.mode{white-space:nowrap;border:1px solid transparent;background:transparent;color:#918b9c;border-radius:999px;padding:6px 10px;font-size:11px}.mode:hover{background:#25222f;color:#ddd}.mode.active{background:#2b243b;border-color:#514269;color:#e7dcff}.composer{display:flex;align-items:flex-end;gap:9px;padding:10px 11px 10px 16px;border:1px solid #3a3545;background:#1b1a23;border-radius:20px;box-shadow:0 12px 40px #0003}.composer:focus-within{border-color:#806bb6}.composer textarea{flex:1;min-height:28px;max-height:130px;resize:none;border:0;outline:0;background:transparent;color:var(--text);padding:5px 0}.composer textarea::placeholder{color:#858091}.send{width:38px;height:38px;border:0;border-radius:13px;background:var(--purple);color:#21192f;font-size:18px;font-weight:900}.send:disabled{opacity:.35;cursor:not-allowed}.mic{width:38px;height:38px;border:1px solid var(--line);background:#25232d;border-radius:13px;color:#c9c1d7}.mic.listening{background:#553c64;border-color:#b69bff}.footnote{text-align:center;color:#777181;font-size:10px;margin:8px 0 0}
-.overlay{position:fixed;inset:0;background:#08070dbd;backdrop-filter:blur(10px);z-index:10;display:none;align-items:center;justify-content:center;padding:18px}.overlay.open{display:flex}.modal{width:min(760px,100%);max-height:min(84vh,800px);display:flex;flex-direction:column;background:#191820;border:1px solid #3d3748;border-radius:22px;overflow:hidden;box-shadow:0 30px 100px #0009}.modal-head{padding:22px 22px 14px}.modal-head h2{font-size:20px;margin:0 0 4px}.modal-head p{margin:0;color:var(--muted);font-size:12px}.modal-search{margin:0 22px 13px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:#111117;color:white}.tabs{display:flex;gap:8px;padding:0 22px 14px}.tab{border:1px solid var(--line);background:transparent;border-radius:999px;padding:7px 15px;color:var(--muted)}.tab.active{background:#332a47;border-color:#7661a3;color:white}.character-grid{overflow:auto;padding:0 22px 22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:11px}.character-card{border:1px solid #35313e;background:#22212a;border-radius:15px;padding:9px;text-align:left;transition:.16s}.character-card:hover{transform:translateY(-2px);border-color:#947ed0;background:#2a2635}.character-card img,.character-card .portrait{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;background:linear-gradient(135deg,#574477,#282235);display:grid;place-items:center;font-size:24px;font-weight:800;color:#e9ddff}
-.character-card [hidden]{display:none!important}.character-card strong{display:block;font-size:12px;margin:7px 2px 0}.character-card small{color:var(--muted);margin:0 2px;font-size:10px}.modal-close{float:right;border:0;background:none;color:var(--muted);font-size:20px}.empty-history{color:#777181;font-size:12px;padding:8px 10px}.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#292436;border:1px solid #594a75;color:#eee5ff;padding:9px 14px;border-radius:12px;font-size:12px;display:none;z-index:30}.toast.show{display:block}
-@media(max-width:760px){.app{grid-template-columns:1fr}.sidebar{display:none}.topbar{padding:0 14px;height:68px}.chat-area{padding:0 14px}.top-actions .pill{display:none}.character-trigger{min-width:0}.welcome h1{font-size:23px}.message{max-width:90%}}@media(max-width:420px){.topbar{gap:6px}.character-trigger{padding:6px 8px}.avatar{width:32px;height:32px}.character-meta strong{font-size:12px}.top-actions{gap:5px}.icon-btn{width:34px;height:34px}}
-
-/* Light theme */
-body[data-theme="light"]{color-scheme:light;--bg:#f5f3f9;--panel:#fff;--panel2:#f0edf6;--line:#ded8e8;--text:#282333;--muted:#716b7d;--purple:#7955bd;--purple2:#6846a6;--soft:#eee8f8;background:var(--bg);color:var(--text)}
-body[data-theme="light"] .sidebar{background:#fff;border-color:var(--line)}
-body[data-theme="light"] .main{background:radial-gradient(ellipse at 50% -35%,#e9def8 0,transparent 48%),var(--bg)}
-body[data-theme="light"] .new-chat{background:#f0eafa;border-color:#d2c2eb;color:#43345f}
-body[data-theme="light"] .new-chat:hover{background:#e8def6}
-body[data-theme="light"] .history-item{color:#514b5e}
-body[data-theme="light"] .history-item:hover,body[data-theme="light"] .history-item.active{background:#eeeaf4;color:#282333}
-body[data-theme="light"] .side-link{color:#716b7d}
-body[data-theme="light"] .side-link:hover{background:#f0edf5;color:#282333}
-body[data-theme="light"] .character-trigger,body[data-theme="light"] .pill,body[data-theme="light"] .icon-btn{background:#fff;border-color:var(--line);color:#514b5e}
-body[data-theme="light"] .suggestion{background:#fff;border-color:#ded8e8;color:#514563}
-body[data-theme="light"] .suggestion:hover{background:#f0eafa}
-body[data-theme="light"] .message.assistant{background:#fff;border-color:#e5e0eb}
-body[data-theme="light"] .mode{color:#777080}
-body[data-theme="light"] .mode:hover{background:#eeeaf4;color:#342d41}
-body[data-theme="light"] .mode.active{background:#eee7f8;border-color:#d5c5ed;color:#533c7b}
-body[data-theme="light"] .composer{background:#fff;border-color:#dcd5e6}
-body[data-theme="light"] .composer textarea{color:#282333}
-body[data-theme="light"] .composer textarea::placeholder{color:#928b9d}
-body[data-theme="light"] .mic{background:#f1eef5;border-color:#ded8e8;color:#514b5e}
-body[data-theme="light"] .footnote{color:#8b8495}
-body[data-theme="light"] .modal{background:#fff;border-color:#ded8e8}
-body[data-theme="light"] .modal-search{background:#f7f5fa;border-color:#ded8e8;color:#282333}
-body[data-theme="light"] .tab{border-color:#ded8e8;color:#716b7d}
-body[data-theme="light"] .tab.active{background:#eee7f8;border-color:#d5c5ed;color:#533c7b}
-body[data-theme="light"] .character-card{background:#f8f6fb;border-color:#e3deea}
-body[data-theme="light"] .character-card:hover{background:#f0eafa;border-color:#bba7dc}
-body[data-theme="light"] .modal-head p,body[data-theme="light"] .character-card small{color:#716b7d}
-body[data-theme="light"] .modal-close{color:#716b7d}
-body[data-theme="light"] .overlay{background:#29233388}
-body[data-theme="light"] .toast{background:#fff;border-color:#d5c5ed;color:#342d41}
-body[data-theme="light"] .welcome-avatar{color:#fff}
-body[data-theme="light"] .message.user{color:#fff}
-@media(max-width:760px){body[data-theme="light"] .sidebar{background:#fff}}
-
+:root{color-scheme:dark;--bg:#101016;--panel:#181820;--panel2:#22212b;--line:#34313e;--text:#f5f2fb;--muted:#a19cad;--purple:#b69bff;--soft:#2b243a;--danger:#e99baf}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--purple);outline-offset:2px}button:disabled{opacity:.4;cursor:not-allowed}
+.app{height:100vh;min-height:580px;display:grid;grid-template-columns:258px minmax(0,1fr);overflow:hidden}.sidebar{background:#15151c;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:19px 13px;min-width:0}.brand{display:flex;align-items:center;gap:10px;padding:0 8px 20px;font-size:19px;font-weight:850;letter-spacing:-.7px}.brandmark{width:31px;height:31px;border-radius:11px;background:linear-gradient(135deg,#c2aaff,#7656c6);display:grid;place-items:center;color:#17121f}.brandname span{color:var(--purple)}.primary,.secondary,.icon,.chip,.mode,.toolbtn,.tab,.history-item{border:1px solid var(--line);background:var(--panel);border-radius:11px;padding:9px 12px}.primary{background:var(--purple);border-color:var(--purple);color:#21192f;font-weight:750}.primary:hover{filter:brightness(1.08)}.secondary:hover,.icon:hover,.chip:hover,.mode:hover,.toolbtn:hover{border-color:#806bb6}.newchat{width:100%;text-align:left;background:#292339;border-color:#55466e;color:#eee5ff;font-weight:700;padding:11px 13px}.sideheading{font-size:10px;text-transform:uppercase;letter-spacing:1.1px;color:#817b8d;font-weight:750;padding:20px 9px 7px}.history-tools{display:flex;gap:6px;padding:0 3px 7px}.history-tools input{width:100%;min-width:0;background:#20202a;border:1px solid var(--line);border-radius:9px;padding:8px;color:var(--text);font-size:12px}.history{overflow:auto;flex:1}.history-item{width:100%;display:flex;align-items:center;gap:8px;text-align:left;margin:2px 0;background:transparent;border-color:transparent;color:#c7c2d0;padding:8px 9px}.history-item:hover,.history-item.active{background:#25232e;border-color:#302c39;color:#fff}.history-item .hist-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}.hist-dot{width:7px;height:7px;border-radius:50%;background:var(--purple);flex:none}.history-item .more{opacity:.5}.history-item:hover .more{opacity:1}.side-bottom{border-top:1px solid var(--line);padding-top:10px}.side-link{width:100%;border:0;background:none;color:var(--muted);padding:9px;text-align:left;border-radius:9px}.side-link:hover{background:#24232d;color:white}
+.main{min-width:0;display:flex;flex-direction:column;background:radial-gradient(ellipse at 50% -35%,#302641 0,transparent 48%),var(--bg)}.topbar{height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;border-bottom:1px solid #ffffff12;gap:12px}.lefttop,.righttop{display:flex;align-items:center;gap:9px;min-width:0}.character-trigger{border:1px solid var(--line);background:#1b1a23;border-radius:13px;padding:6px 11px;display:flex;align-items:center;gap:10px;min-width:190px;text-align:left}.avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#4c3a68,#282334);display:grid;place-items:center;font-weight:800;color:#e9ddff;flex:none;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover}.char-meta{min-width:0}.char-meta strong{display:block;font-size:13px}.char-meta small{color:var(--muted);font-size:11px}.chev{margin-left:auto;color:var(--muted)}.icon{width:37px;height:37px;padding:0;display:grid;place-items:center;color:#c7c0d2}.righttop .chip{border-radius:999px;font-size:11px;color:#c8c2d3}.content{flex:1;min-height:0;display:flex;flex-direction:column;max-width:1050px;width:100%;margin:0 auto;padding:0 28px}.welcome{margin:auto;text-align:center;max-width:660px;padding:26px 10px}.welcome-avatar{width:84px;height:84px;border-radius:50%;margin:0 auto 17px;display:grid;place-items:center;background:linear-gradient(135deg,#574477,#282235);border:2px solid #7f69a9;color:#f2eaff;font-size:27px;font-weight:800;overflow:hidden}.welcome-avatar img{width:100%;height:100%;object-fit:cover}.welcome h1{font-size:27px;letter-spacing:-1px;margin:0 0 7px}.welcome p{color:var(--muted);margin:0 auto;max-width:500px}.welcome-actions,.suggestions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:18px}.suggestion{background:#1d1b26;border:1px solid #393345;border-radius:999px;padding:9px 13px;color:#d3c9e4;font-size:12px}.messages{flex:1;overflow:auto;display:flex;flex-direction:column;gap:16px;padding:26px 2px 22px}.message{max-width:min(82%,720px);padding:13px 15px;border-radius:17px;white-space:pre-wrap;overflow-wrap:anywhere;position:relative}.message.user{align-self:flex-end;background:linear-gradient(135deg,#7057a8,#594486);border-bottom-right-radius:5px}.message.assistant{align-self:flex-start;background:#211f29;border:1px solid #ffffff0c;border-bottom-left-radius:5px}.speaker{font-size:10px;color:#c8b6f0;font-weight:750;margin-bottom:5px}.msgtext{font-size:14px}.msg-actions{display:flex;gap:5px;margin-top:9px;opacity:.68;flex-wrap:wrap}.msg-actions button{font-size:10px;border:1px solid #ffffff22;background:#ffffff09;border-radius:7px;padding:4px 7px;color:inherit}.msg-actions button:hover{opacity:1;background:#ffffff19}.typing{color:var(--muted);font-size:12px;padding:0 4px 10px}
+.composer-wrap{padding:10px 0 16px}.mode-strip{display:flex;gap:7px;overflow:auto;padding:0 2px 9px}.mode{white-space:nowrap;border-color:transparent;background:transparent;color:#918b9c;border-radius:999px;padding:6px 10px;font-size:11px}.mode.active{background:#2b243b;border-color:#514269;color:#e7dcff}.composer{display:flex;align-items:flex-end;gap:8px;padding:9px 10px 9px 15px;border:1px solid #3a3545;background:#1b1a23;border-radius:19px}.composer:focus-within{border-color:#806bb6}.composer textarea{flex:1;min-height:28px;max-height:135px;resize:none;border:0;outline:0;background:transparent;color:var(--text);padding:5px 0}.composer textarea::placeholder{color:#858091}.send{width:38px;height:38px;border:0;border-radius:12px;background:var(--purple);color:#21192f;font-size:18px;font-weight:900}.mic{width:38px;height:38px;border:1px solid var(--line);background:#25232d;border-radius:12px;color:#c9c1d7}.mic.listening{background:#553c64;border-color:#b69bff}.footnote{text-align:center;color:#777181;font-size:10px;margin:7px 0 0}
+.overlay{position:fixed;inset:0;background:#08070dc4;backdrop-filter:blur(9px);z-index:20;display:none;align-items:center;justify-content:center;padding:16px}.overlay.open{display:flex}.modal{width:min(790px,100%);max-height:min(88vh,850px);display:flex;flex-direction:column;background:#191820;border:1px solid #3d3748;border-radius:20px;overflow:hidden;box-shadow:0 30px 100px #0009}.modal-head{padding:20px 22px 13px}.modal-head h2{font-size:20px;margin:0 0 3px}.modal-head p{margin:0;color:var(--muted);font-size:12px}.modal-close{float:right;border:0;background:none;color:var(--muted);font-size:21px}.modal-search{margin:0 22px 12px;padding:10px 13px;border:1px solid var(--line);border-radius:10px;background:#111117;color:white}.tabs{display:flex;gap:7px;padding:0 22px 13px;flex-wrap:wrap}.tab{border-radius:999px;background:transparent;color:var(--muted);padding:7px 13px}.tab.active{background:#332a47;border-color:#7661a3;color:white}.character-grid{overflow:auto;padding:0 22px 22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px}.character-card{border:1px solid #35313e;background:#22212a;border-radius:14px;padding:9px;text-align:left}.character-card:hover{border-color:#947ed0;background:#2a2635}.character-card img,.portrait-fallback{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;background:linear-gradient(135deg,#574477,#282235);display:grid;place-items:center;font-size:24px;font-weight:800;color:#e9ddff}.character-card strong{display:block;font-size:12px;margin:7px 2px 0}.character-card small{color:var(--muted);margin:0 2px;font-size:10px}.profile-panel{padding:0 22px 22px;overflow:auto}.profile-hero{display:flex;align-items:center;gap:16px;padding:5px 0 16px}.profile-hero .avatar{width:76px;height:76px}.profile-hero h3{margin:0;font-size:18px}.profile-hero p{margin:2px 0;color:var(--muted);font-size:12px}.profile-summary{color:#d4cfdd;background:#22212a;border:1px solid #383442;border-radius:13px;padding:14px}.profile-summary p{margin:0 0 8px}.profile-summary p:last-child{margin:0}.study-body{padding:0 22px 22px;overflow:auto}.study-intro{color:var(--muted);font-size:12px;margin:0 0 14px}.field{display:block;margin:11px 0}.field span{display:block;font-size:12px;color:#c8c2d0;margin-bottom:5px}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:10px;background:#111117;color:var(--text);padding:10px}.field textarea{min-height:100px;resize:vertical}.study-card{border:1px solid #3a3545;background:#22212a;border-radius:14px;padding:16px;margin:10px 0}.study-card h3{margin:0 0 8px;font-size:16px}.answer-list{display:grid;gap:8px;margin:12px 0}.answer-option{background:#17161e;border:1px solid #454050;border-radius:10px;padding:10px;text-align:left}.answer-option.selected{border-color:var(--purple);background:#302740}.feedback{padding:10px;border-radius:10px;margin-top:10px;background:#292436;color:#eee5ff}.flashcard{min-height:150px;display:grid;place-items:center;text-align:center;font-size:19px;font-weight:650;cursor:pointer}.flashcard small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:10px}.modal-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.empty-history{color:#777181;font-size:12px;padding:8px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#292436;border:1px solid #594a75;color:#eee5ff;padding:9px 14px;border-radius:12px;font-size:12px;display:none;z-index:40}.toast.show{display:block}.mobile-menu{display:none}
+@media(max-width:780px){.app{grid-template-columns:1fr}.sidebar{position:fixed;z-index:15;inset:0 auto 0 0;width:min(290px,85vw);transform:translateX(-105%);transition:transform .2s;box-shadow:15px 0 50px #0008}.sidebar.open{transform:translateX(0)}.mobile-menu{display:grid}.topbar{padding:0 13px;height:66px}.content{padding:0 14px}.righttop .chip{display:none}.welcome h1{font-size:23px}.message{max-width:92%}.character-trigger{min-width:0}.footnote{font-size:9px}}
+@media(max-width:420px){.topbar{gap:5px}.character-trigger{padding:5px 7px;gap:7px}.avatar{width:31px;height:31px}.char-meta strong{font-size:11px}.righttop{gap:5px}.icon{width:33px;height:33px}}
+body[data-theme="light"]{color-scheme:light;--bg:#f5f3f9;--panel:#fff;--panel2:#f0edf6;--line:#ded8e8;--text:#282333;--muted:#716b7d;--purple:#7955bd;--soft:#eee8f8;background:var(--bg);color:var(--text)}
+body[data-theme="light"] .sidebar,body[data-theme="light"] .modal{background:#fff;border-color:var(--line)}body[data-theme="light"] .main{background:radial-gradient(ellipse at 50% -35%,#e9def8 0,transparent 48%),var(--bg)}body[data-theme="light"] .character-trigger,body[data-theme="light"] .icon,body[data-theme="light"] .history-tools input,body[data-theme="light"] .modal-search,body[data-theme="light"] .field input,body[data-theme="light"] .field textarea,body[data-theme="light"] .field select{background:#fff;border-color:var(--line);color:var(--text)}body[data-theme="light"] .history-item{color:#514b5e}body[data-theme="light"] .history-item:hover,body[data-theme="light"] .history-item.active{background:#eeeaf4;color:#282333}body[data-theme="light"] .suggestion,body[data-theme="light"] .character-card,body[data-theme="light"] .profile-summary,body[data-theme="light"] .study-card{background:#fff;border-color:var(--line);color:#342d41}body[data-theme="light"] .message.assistant{background:#fff;border-color:#e5e0eb}body[data-theme="light"] .composer{background:#fff;border-color:var(--line)}body[data-theme="light"] .composer textarea{color:var(--text)}body[data-theme="light"] .mode{color:#777080}body[data-theme="light"] .mode.active{background:#eee7f8;border-color:#d5c5ed;color:#533c7b}body[data-theme="light"] .answer-option{background:#f7f5fa;border-color:var(--line);color:var(--text)}body[data-theme="light"] .answer-option.selected{background:#eee7f8;border-color:#9b80cb}body[data-theme="light"] .feedback{background:#eee7f8;color:#342d41}body[data-theme="light"] .tab.active{background:#eee7f8;border-color:#d5c5ed;color:#533c7b}body[data-theme="light"] .profile-summary{color:#514b5e}
 </style>
 </head>
 <body>
 <div class="app">
-<aside class="sidebar">
-  <div class="brand"><div class="brand-mark">✦</div><span>companion<span>.</span></span></div>
-  <button class="new-chat" id="newChat"><span>＋</span> New conversation</button>
-  <div class="side-label">Recent conversations</div>
-  <div class="history" id="history"></div>
-  <div class="side-bottom">
-    <button class="side-link" id="voiceToggle">◖ Voice read-aloud: off</button>
-    <button class="side-link" id="aboutButton">ⓘ About companion</button>
-  </div>
+<aside class="sidebar" id="sidebar">
+ <div class="brand"><div class="brandmark">✦</div><div class="brandname">companion<span>.</span></div></div>
+ <button class="primary newchat" id="newChat">＋ &nbsp;New conversation</button>
+ <div class="sideheading">Your conversations</div>
+ <div class="history-tools"><input id="historySearch" placeholder="Search chats…" aria-label="Search conversations"></div>
+ <div class="history" id="history"></div>
+ <div class="side-bottom"><button class="side-link" id="studyOpen">▤ &nbsp; Study center</button><button class="side-link" id="voiceToggle">◖ &nbsp; Read-aloud: off</button><button class="side-link" id="themeSide">☼ &nbsp; Switch theme</button><button class="side-link" id="aboutButton">ⓘ &nbsp; About & privacy</button></div>
 </aside>
 <main class="main">
-  <header class="topbar">
-    <button class="character-trigger" id="pickCharacter" aria-label="Choose character">
-      <div class="avatar" id="topAvatar">✦</div>
-      <div class="character-meta"><strong id="topName">Choose a character</strong><small id="topSub">Start a new conversation</small></div>
-      <span class="chevron">⌄</span>
-    </button>
-    <div class="top-actions">
-      <button class="pill active" id="voicePill">Voice: off</button>
-      <button class="icon-btn" id="themeToggle" title="Switch to light mode" aria-label="Switch to light mode">☼</button>
-      <button class="icon-btn" id="clearChat" title="Clear this conversation" aria-label="Clear conversation">⌫</button>
-    </div>
-  </header>
-  <section class="chat-area">
-    <div class="welcome" id="welcome">
-      <div class="welcome-avatar" id="welcomeAvatar">✦</div>
-      <h1 id="welcomeTitle">A conversation that feels like yours.</h1>
-      <p id="welcomeText">Choose a character to begin. Each character has a separate conversation, so you can pick up where you left off.</p>
-      <div class="suggestions">
-        <button class="suggestion" data-prompt="Tell me about yourself.">Tell me about yourself</button>
-        <button class="suggestion" data-prompt="I'm studying and could use some help.">Help me study</button>
-        <button class="suggestion" data-prompt="Let's have a fun conversation.">Just chat</button>
-      </div>
-    </div>
-    <div class="messages" id="messages" hidden></div>
-    <div class="composer-wrap">
-      <div class="mode-strip" id="modeStrip">
-        <button class="mode active" data-mode="Conversation">◉ Conversation</button>
-        <button class="mode" data-mode="Study">▤ Study</button>
-        <button class="mode" data-mode="Entertainment">✧ Entertainment</button>
-        <button class="mode" data-mode="Productivity">✓ Productivity</button>
-        <button class="mode" data-mode="Learning">⌘ Learning</button>
-        <button class="mode" data-mode="Gaming">♟ Gaming</button>
-      </div>
-      <div class="composer">
-        <textarea id="messageInput" rows="1" placeholder="Choose a character to start chatting…" disabled></textarea>
-        <button class="mic" id="micButton" title="Voice input" aria-label="Voice input">♩</button>
-        <button class="send" id="sendButton" disabled aria-label="Send message">↑</button>
-      </div>
-      <div class="footnote">Your conversations are saved in this browser. AI replies are a demo until an AI service is connected.</div>
-    </div>
-  </section>
+ <header class="topbar">
+  <div class="lefttop"><button class="icon mobile-menu" id="menuButton" aria-label="Open menu">☰</button><button class="character-trigger" id="pickCharacter"><div class="avatar" id="topAvatar">✦</div><div class="char-meta"><strong id="topName">Choose a character</strong><small id="topSub">Start a new conversation</small></div><span class="chev">⌄</span></button></div>
+  <div class="righttop"><button class="chip" id="profileButton">Character profile</button><button class="icon" id="themeToggle" title="Switch theme" aria-label="Switch theme">☼</button><button class="icon" id="chatMenu" title="Conversation options" aria-label="Conversation options">•••</button></div>
+ </header>
+ <section class="content">
+  <div class="welcome" id="welcome"><div class="welcome-avatar" id="welcomeAvatar">✦</div><h1 id="welcomeTitle">A space to chat, learn, and create.</h1><p id="welcomeText">Choose a character to start. Your conversations stay separate, and the study tools work right in your browser.</p><div class="suggestions"><button class="suggestion" data-prompt="Tell me about yourself.">Get to know a character</button><button class="suggestion" data-prompt="Help me understand a topic I'm studying.">Help me study</button><button class="suggestion" data-action="study">Open study center</button></div></div>
+  <div class="messages" id="messages" hidden></div>
+  <div class="composer-wrap"><div class="mode-strip" id="modeStrip"><button class="mode active" data-mode="Conversation">◉ Conversation</button><button class="mode" data-mode="Study">▤ Study</button><button class="mode" data-mode="Entertainment">✧ Entertainment</button><button class="mode" data-mode="Productivity">✓ Productivity</button><button class="mode" data-mode="Learning">⌘ Learning</button><button class="mode" data-mode="Gaming">♟ Gaming</button></div><div class="composer"><textarea id="messageInput" rows="1" placeholder="Choose a character to start chatting…" disabled></textarea><button class="mic" id="micButton" title="Voice input" aria-label="Voice input">♩</button><button class="send" id="sendButton" disabled aria-label="Send message">↑</button></div><div class="footnote" id="footnote">Demo chat only — no AI service is connected. Study tools run locally in your browser.</div></div>
+ </section>
 </main>
 </div>
-<div class="overlay" id="pickerOverlay">
-  <section class="modal" role="dialog" aria-modal="true" aria-label="Choose a character">
-    <div class="modal-head"><button class="modal-close" data-close="pickerOverlay">×</button><h2>Choose your companion</h2><p>Choose a character to start a separate conversation.</p></div>
-    <input class="modal-search" id="characterSearch" placeholder="Search characters…" autocomplete="off">
-    <div class="tabs"><button class="tab active" data-group="Girls">Girls</button><button class="tab" data-group="Boys">Boys</button></div>
-    <div class="character-grid" id="characterGrid"></div>
-  </section>
-</div>
-<div class="overlay" id="aboutOverlay">
-  <section class="modal" role="dialog" aria-modal="true" aria-label="About companion">
-    <div class="modal-head"><button class="modal-close" data-close="aboutOverlay">×</button><h2>About companion.</h2><p>A personal character-chat interface.</p></div>
-    <div style="padding:0 22px 24px;color:#c8c2d0;font-size:13px;line-height:1.7">
-      <p>This version is a front-end prototype. It includes character selection, separate chat histories, six chat modes, browser voice input, and optional read-aloud.</p>
-      <p><strong>Important:</strong> The replies are demo responses, not a connected AI model. Conversations are stored only in this browser using local storage; they are not synced across devices.</p>
-      <p>Real AI conversations, secure account-based memory, and animated 2D characters require additional services and are not active in this version.</p>
-    </div>
-  </section>
-</div>
-<div class="toast" id="toast"></div>
+<div class="overlay" id="pickerOverlay"><section class="modal" role="dialog" aria-modal="true" aria-label="Choose a character"><div class="modal-head"><button class="modal-close" data-close="pickerOverlay">×</button><h2>Choose your companion</h2><p>Each character has their own profile and separate conversation.</p></div><input class="modal-search" id="characterSearch" placeholder="Search by character or anime…" autocomplete="off"><div class="tabs"><button class="tab active" data-group="Girls">Girls</button><button class="tab" data-group="Boys">Boys</button></div><div class="character-grid" id="characterGrid"></div></section></div>
+<div class="overlay" id="profileOverlay"><section class="modal" role="dialog" aria-modal="true" aria-label="Character profile"><div class="modal-head"><button class="modal-close" data-close="profileOverlay">×</button><h2>Character profile</h2><p>A quick introduction and conversation style.</p></div><div class="profile-panel" id="profilePanel"></div></section></div>
+<div class="overlay" id="studyOverlay"><section class="modal" role="dialog" aria-modal="true" aria-label="Study center"><div class="modal-head"><button class="modal-close" data-close="studyOverlay">×</button><h2>Study center</h2><p>Practice, review, and organize your learning — no AI connection required.</p></div><div class="tabs" id="studyTabs"><button class="tab active" data-study="quiz">Quiz maker</button><button class="tab" data-study="practice">Practice</button><button class="tab" data-study="flashcards">Flashcards</button><button class="tab" data-study="notes">Notes</button></div><div class="study-body" id="studyBody"></div></section></div>
+<div class="overlay" id="aboutOverlay"><section class="modal" role="dialog" aria-modal="true" aria-label="About and privacy"><div class="modal-head"><button class="modal-close" data-close="aboutOverlay">×</button><h2>About companion.</h2><p>What works in this version and where your data lives.</p></div><div class="study-body"><div class="study-card"><h3>No AI is connected</h3><p>Chat replies are clearly marked demo responses. There is no API key, AI provider, backend, or paid AI usage in this version.</p></div><div class="study-card"><h3>Local privacy</h3><p>Chats, study sets, and preferences are saved in this browser's local storage. They are not synced to an account or other devices. Anyone with access to this browser profile may be able to see them.</p><div class="modal-actions"><button class="secondary" id="exportData">Export my data</button><button class="secondary" id="deleteAllData" style="color:var(--danger)">Delete all local data</button></div></div><p class="study-intro">Character portraits are loaded from public anime databases when available. Voice input and read-aloud depend on browser support. Video generation and live AI voice chat are not included.</p></div></section></div>
+<div class="overlay" id="optionsOverlay"><section class="modal" role="dialog" aria-modal="true" aria-label="Conversation options"><div class="modal-head"><button class="modal-close" data-close="optionsOverlay">×</button><h2>Conversation options</h2><p>Manage this chat.</p></div><div class="study-body"><div class="modal-actions"><button class="secondary" id="renameChat">Rename conversation</button><button class="secondary" id="exportChat">Export conversation</button><button class="secondary" id="clearChat">Clear messages</button><button class="secondary" id="deleteChat" style="color:var(--danger)">Delete conversation</button></div></div></section></div>
+<div class="toast" id="toast" role="status"></div>
 <script>
-const characters = [
- {name:"Mai Sakurajima",group:"Girls",anime:"Rascal Does Not Dream",query:"Mai Sakurajima"},
- {name:"Ichika Nakano",group:"Girls",anime:"The Quintessential Quintuplets",query:"Ichika Nakano"},
- {name:"Nino Nakano",group:"Girls",anime:"The Quintessential Quintuplets",query:"Nino Nakano"},
- {name:"Miku Nakano",group:"Girls",anime:"The Quintessential Quintuplets",query:"Miku Nakano"},
- {name:"Yotsuba Nakano",group:"Girls",anime:"The Quintessential Quintuplets",query:"Yotsuba Nakano"},
- {name:"Itsuki Nakano",group:"Girls",anime:"The Quintessential Quintuplets",query:"Itsuki Nakano"},
- {name:"Akari Watanabe",group:"Girls",anime:"More Than a Married Couple",query:"Akari Watanabe"},
- {name:"Marin Kitagawa",group:"Girls",anime:"My Dress-Up Darling",query:"Marin Kitagawa"},
- {name:"Zero Two",group:"Girls",anime:"DARLING in the FRANXX",query:"Zero Two"},
- {name:"Alya",group:"Girls",anime:"Alya Sometimes Hides Her Feelings in Russian",query:"Alisa Mikhailovna Kujou"},
- {name:"Satoru Gojo",group:"Boys",anime:"Jujutsu Kaisen",query:"Satoru Gojo"},
- {name:"Ryomen Sukuna",group:"Boys",anime:"Jujutsu Kaisen",query:"Sukuna"},
- {name:"Kakashi Hatake",group:"Boys",anime:"Naruto",query:"Kakashi Hatake"},
- {name:"Might Guy",group:"Boys",anime:"Naruto",query:"Might Guy"},
- {name:"Escanor",group:"Boys",anime:"The Seven Deadly Sins",query:"Escanor"},
- {name:"Goku",group:"Boys",anime:"Dragon Ball",query:"Son Goku"},
- {name:"Izuku Midoriya",group:"Boys",anime:"My Hero Academia",query:"Izuku Midoriya"},
- {name:"Edward Elric",group:"Boys",anime:"Fullmetal Alchemist",query:"Edward Elric"}
+const characters=[
+{name:"Mai Sakurajima",group:"Girls",anime:"Rascal Does Not Dream",query:"Mai Sakurajima",bio:"Calm, perceptive, and quietly witty. Mai tends to be direct without being unkind, notices small details, and gives thoughtful advice rather than making a fuss."},
+{name:"Ichika Nakano",group:"Girls",anime:"The Quintessential Quintuplets",query:"Ichika Nakano",bio:"Relaxed, playful, and teasing, with a mature side. Ichika likes light humor but can become thoughtful and encouraging when a conversation gets serious."},
+{name:"Nino Nakano",group:"Girls",anime:"The Quintessential Quintuplets",query:"Nino Nakano",bio:"Confident, outspoken, and fiercely loyal. Nino says what she thinks, brings lots of energy, and shows that she cares through practical encouragement."},
+{name:"Miku Nakano",group:"Girls",anime:"The Quintessential Quintuplets",query:"Miku Nakano",bio:"Quiet, observant, and thoughtful. Miku often takes time to find the right words, enjoys history, and prefers sincere conversations over being the center of attention."},
+{name:"Yotsuba Nakano",group:"Girls",anime:"The Quintessential Quintuplets",query:"Yotsuba Nakano",bio:"Upbeat, energetic, and supportive. Yotsuba brings enthusiasm to new ideas, cheers people on, and tries to make activities feel fun and welcoming."},
+{name:"Itsuki Nakano",group:"Girls",anime:"The Quintessential Quintuplets",query:"Itsuki Nakano",bio:"Earnest, disciplined, and curious. Itsuki values clear explanations, takes learning seriously, and can be stubborn when she believes something matters."},
+{name:"Akari Watanabe",group:"Girls",anime:"More Than a Married Couple",query:"Akari Watanabe",bio:"Expressive, sociable, and quick-witted. Akari enjoys playful banter but also has a sincere, considerate side beneath her confident exterior."},
+{name:"Marin Kitagawa",group:"Girls",anime:"My Dress-Up Darling",query:"Marin Kitagawa",bio:"Friendly, enthusiastic, and creative. Marin gets excited about hobbies, encourages people to enjoy what they love, and speaks openly and warmly."},
+{name:"Zero Two",group:"Girls",anime:"DARLING in the FRANXX",query:"Zero Two",bio:"Bold, curious, and mischievous. Zero Two enjoys unusual questions and playful challenges, while being more reflective when discussing trust and belonging."},
+{name:"Alya",group:"Girls",anime:"Alya Sometimes Hides Her Feelings in Russian",query:"Alisa Mikhailovna Kujou",bio:"Composed, clever, and competitive. Alya is academically minded, a little proud, and often uses dry humor while trying to hide how much she cares."},
+{name:"Satoru Gojo",group:"Boys",anime:"Jujutsu Kaisen",query:"Satoru Gojo",bio:"Playful, confident, and quick with jokes. Gojo likes to keep things light, but can switch into a sharp, focused mentor when explaining a difficult idea."},
+{name:"Ryomen Sukuna",group:"Boys",anime:"Jujutsu Kaisen",query:"Sukuna",bio:"Arrogant, blunt, and intimidating in the source material. This chat portrayal keeps the sharp confidence and cutting wit fictional and non-threatening."},
+{name:"Kakashi Hatake",group:"Boys",anime:"Naruto",query:"Kakashi Hatake",bio:"Laid-back, observant, and quietly wise. Kakashi favors calm advice, practical examples, and a little dry humor; he rarely needs to raise his voice."},
+{name:"Might Guy",group:"Boys",anime:"Naruto",query:"Might Guy",bio:"Loudly optimistic, energetic, and encouraging. Guy loves a challenge, celebrates effort, and turns ordinary goals into enthusiastic training missions."},
+{name:"Escanor",group:"Boys",anime:"The Seven Deadly Sins",query:"Escanor",bio:"Formal, proud, and eloquent. Escanor speaks with grand confidence, though his gentler side values kindness, humility, and sincere connection."},
+{name:"Goku",group:"Boys",anime:"Dragon Ball",query:"Son Goku",bio:"Cheerful, straightforward, and endlessly curious. Goku loves friendly competition, simple explanations, food, and learning by trying things out."},
+{name:"Izuku Midoriya",group:"Boys",anime:"My Hero Academia",query:"Izuku Midoriya",bio:"Kind, analytical, and determined. Midoriya thinks through details, gets excited about how things work, and encourages steady improvement."},
+{name:"Edward Elric",group:"Boys",anime:"Fullmetal Alchemist",query:"Edward Elric",bio:"Sharp-tongued, passionate, and resourceful. Edward enjoys solving problems, challenges sloppy reasoning, and cares deeply about fairness and responsibility."}
 ];
-const $ = id => document.getElementById(id);
-let group="Girls", activeCharacter=null, activeChatId=null, mode="Conversation", voiceOn=false, recognition=null, listening=false;
-let chats = loadChats();
-function loadChats(){try{return JSON.parse(localStorage.getItem("companion_chats_v2")||"[]")}catch{return []}}
-function save(){try{localStorage.setItem("companion_chats_v2",JSON.stringify(chats))}catch{toast("Browser storage is full; this chat may not be saved.")}}
-function toast(message){$("toast").textContent=message;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2600)}
-function initials(name){return name.split(" ").map(x=>x[0]).slice(0,2).join("")}
-const portraitCache = {};
-const portraitQueue = [];
-let portraitBusy = false;
-function portraitUrl(person){return portraitCache[person.name]||""}
-function enqueuePortrait(person, img, fallback){
-  if(!person)return;
-  const cached=portraitUrl(person);
-  if(cached){img.src=cached;img.hidden=false;fallback.hidden=true;return}
-  if(!img.dataset.queued){
-    img.dataset.queued="1";
-    portraitQueue.push({person,img,fallback});
-    processPortraitQueue();
-  }
-}
-async function lookupPortrait(person){
-  const search=person.query||person.name;
-  // AniList's GraphQL API is the primary source; Jikan is a backup.
-  try{
-    const response=await fetch("https://graphql.anilist.co",{
-      method:"POST",
-      headers:{"Content-Type":"application/json","Accept":"application/json"},
-      body:JSON.stringify({query:"query ($search: String) { Character(search: $search) { name { full } image { large } } }",variables:{search}})
-    });
-    if(response.ok){
-      const data=await response.json();
-      const found=data?.data?.Character;
-      if(found?.image?.large)return found.image.large;
-    }
-  }catch(error){}
-  try{
-    const response=await fetch("https://api.jikan.moe/v4/characters?q="+encodeURIComponent(search)+"&limit=5");
-    if(response.ok){
-      const data=await response.json(),list=data.data||[];
-      const normalized=search.toLowerCase().replace(/[^a-z0-9]/g,"");
-      const match=list.find(x=>(x.name||"").toLowerCase().replace(/[^a-z0-9]/g,"")===normalized)||list[0];
-      const url=match?.images?.webp?.image_url||match?.images?.jpg?.image_url||"";
-      if(url)return url;
-    }
-  }catch(error){}
-  return "";
-}
-async function processPortraitQueue(){
-  if(portraitBusy)return;portraitBusy=true;
-  while(portraitQueue.length){
-    const item=portraitQueue.shift(),p=item.person;
-    try{
-      let url=portraitCache[p.name]||"";
-      if(!url){
-        url=await lookupPortrait(p);
-        if(url){portraitCache[p.name]=url;try{localStorage.setItem("companion_portraits_v1",JSON.stringify(portraitCache))}catch{}}
-      }
-      if(url&&item.img.isConnected){item.img.src=url;item.img.hidden=false;item.fallback.hidden=true}
-    }catch(error){}
-    await new Promise(resolve=>setTimeout(resolve,750));
-  }
-  portraitBusy=false;
-}
-try{Object.assign(portraitCache,JSON.parse(localStorage.getItem("companion_portraits_v1")||"{}"))}catch{}
-function setAvatar(el,person){
-  el.innerHTML="";
-  const fallback=document.createElement("span");fallback.textContent=initials(person.name);
-  const img=document.createElement("img");img.alt=person.name+" portrait";img.hidden=true;img.loading="lazy";
-  img.style.cssText="width:100%;height:100%;object-fit:cover;border-radius:inherit";
-  img.onerror=()=>{img.hidden=true;fallback.hidden=false};
-  el.append(img,fallback);enqueuePortrait(person,img,fallback);
-}
-function currentChat(){return chats.find(c=>c.id===activeChatId)}
-function openOverlay(id){$(id).classList.add("open")}
-function closeOverlay(id){$(id).classList.remove("open")}
-function selectCharacter(name){
- const person=characters.find(c=>c.name===name);if(!person)return;
- activeCharacter=person;
- let chat=chats.find(c=>c.character===name);
- if(!chat){chat={id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),character:name,mode:"Conversation",messages:[],updated:Date.now()};chats.unshift(chat)}
- activeChatId=chat.id;mode=chat.mode||"Conversation";save();updateHeader();renderMessages();renderHistory();setModeButtons();closeOverlay("pickerOverlay");
- $("messageInput").disabled=false;$("messageInput").placeholder="Message "+name+"…";$("sendButton").disabled=false;
- $("welcomeTitle").textContent="Say hello to "+name+".";
- $("welcomeText").textContent="A new conversation with "+name+". Your chat history stays separate from other characters.";
- setAvatar($("welcomeAvatar"),person);
-}
-function updateHeader(){
- if(!activeCharacter)return;
- $("topName").textContent=activeCharacter.name;$("topSub").textContent=activeCharacter.anime;
- setAvatar($("topAvatar"),activeCharacter);setAvatar($("welcomeAvatar"),activeCharacter);
-}
-function renderHistory(){
- const el=$("history");el.innerHTML="";
- if(!chats.length){el.innerHTML='<div class="empty-history">Your conversations will appear here.</div>';return}
- chats.slice(0,30).forEach(c=>{const b=document.createElement("button");b.className="history-item"+(c.id===activeChatId?" active":"");b.innerHTML='<span class="hist-dot"></span><span class="hist-name"></span>';b.querySelector(".hist-name").textContent=c.character;b.onclick=()=>{activeChatId=c.id;activeCharacter=characters.find(x=>x.name===c.character)||{name:c.character,anime:"Character"};mode=c.mode||"Conversation";updateHeader();renderMessages();setModeButtons();renderHistory();$("messageInput").disabled=false;$("sendButton").disabled=false;$("messageInput").placeholder="Message "+c.character+"…"};el.appendChild(b)});
-}
-function renderMessages(){
- const chat=currentChat(),el=$("messages");
- if(!chat||!chat.messages.length){el.hidden=true;$("welcome").hidden=false;return}
- $("welcome").hidden=true;el.hidden=false;el.innerHTML="";
- chat.messages.forEach(m=>{const wrap=document.createElement("div");wrap.className="message "+(m.role==="user"?"user":"assistant");if(m.role!=="user"){const who=document.createElement("div");who.className="speaker";who.textContent=chat.character;wrap.appendChild(who)}const body=document.createElement("div");body.className="body";body.textContent=m.text;wrap.appendChild(body);el.appendChild(wrap)});
- el.scrollTop=el.scrollHeight;
-}
-function setModeButtons(){document.querySelectorAll(".mode").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode))}
-function renderPicker(){
- const grid=$("characterGrid"),q=$("characterSearch").value.toLowerCase();grid.innerHTML="";
- characters.filter(c=>c.group===group&&(!q||(c.name+" "+c.anime).toLowerCase().includes(q))).forEach(c=>{
-  const card=document.createElement("button");card.className="character-card";
-  const portrait=document.createElement("img");portrait.className="portrait";portrait.alt=c.name+" portrait";portrait.loading="lazy";const fallback=document.createElement("div");fallback.className="portrait";fallback.textContent=initials(c.name);portrait.hidden=true;portrait.onerror=()=>{portrait.hidden=true;fallback.hidden=false};enqueuePortrait(c,portrait,fallback);
-  const name=document.createElement("strong");name.textContent=c.name;
-  const anime=document.createElement("small");anime.textContent=c.anime;
-  card.append(portrait,fallback,name,anime);card.onclick=()=>selectCharacter(c.name);grid.appendChild(card);
- });
-}
-function setMode(next){mode=next;const chat=currentChat();if(chat){chat.mode=next;save()}setModeButtons();toast(next+" mode selected")}
-function demoReply(text, characterName, selectedMode){
- const n=characterName||"Your companion",m=selectedMode||"Conversation";
- if(m==="Study")return "Let's work through it together. Tell me what part is confusing, and I'll break it into manageable steps.\n\n(Study-mode demo reply — connect an AI service to get real answers.)";
- if(m==="Productivity")return "Let's make a simple plan. What's the one thing you'd like to get done first?\n\n(Productivity-mode demo reply — connect an AI service for real assistance.)";
- if(m==="Learning")return "That's a good topic to explore. We can start with the basics, then build up one idea at a time.\n\n(Learning-mode demo reply — connect an AI service for real explanations.)";
- if(m==="Gaming")return "I'm ready for a game. We could do 20 questions, trivia, or a word game. Which sounds fun?\n\n(Gaming-mode demo reply.)";
- if(m==="Entertainment")return "That sounds fun. We could talk about anime, make up a story idea, or play a quick game.\n\n(Entertainment-mode demo reply.)";
- return "Hey! I'm "+n+". Thanks for starting a conversation. I'd love to hear more about what you have in mind.\n\n(This is a demo response. Real AI replies aren't connected yet.)";
-}
-function sendMessage(text){
- const clean=text.trim(),chat=currentChat();if(!clean||!chat)return;
- const characterName=chat.character,selectedMode=chat.mode||mode;
- chat.messages.push({role:"user",text:clean,at:Date.now()});chat.updated=Date.now();chat.mode=selectedMode;save();$("messageInput").value="";resizeInput();renderMessages();renderHistory();
- const typing=document.createElement("div");typing.className="typing";typing.textContent=characterName+" is typing…";
- if(activeChatId===chat.id){$("messages").appendChild(typing);$("messages").scrollTop=$("messages").scrollHeight}
- setTimeout(()=>{typing.remove();const reply=demoReply(clean,characterName,selectedMode);chat.messages.push({role:"assistant",text:reply,at:Date.now()});chat.updated=Date.now();save();if(activeChatId===chat.id){renderMessages();renderHistory();if(voiceOn)speak(reply)}else{renderHistory()}},650);
-}
-function resizeInput(){const x=$("messageInput");x.style.height="auto";x.style.height=Math.min(x.scrollHeight,130)+"px"}
-function speak(text){if(!("speechSynthesis" in window)){toast("Read-aloud is not supported in this browser.");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=1;u.pitch=1;speechSynthesis.speak(u)}
-function toggleVoice(){voiceOn=!voiceOn;$("voicePill").textContent="Voice: "+(voiceOn?"on":"off");$("voicePill").classList.toggle("active",voiceOn);$("voiceToggle").textContent="◖ Voice read-aloud: "+(voiceOn?"on":"off");toast("Read-aloud "+(voiceOn?"enabled":"disabled"))}
-function startMic(){
- const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
- if(!SR){toast("Voice input isn't supported here. Try Chrome.");return}
- if(listening){recognition.stop();return}
- recognition=new SR();recognition.lang="en-US";recognition.interimResults=false;recognition.onstart=()=>{listening=true;$("micButton").classList.add("listening")};recognition.onend=()=>{listening=false;$("micButton").classList.remove("listening")};recognition.onerror=()=>toast("Couldn't hear that. Please try again.");recognition.onresult=e=>{$("messageInput").value+=($("messageInput").value?" ":"")+e.results[0][0].transcript;resizeInput()};recognition.start();
-}
-$("pickCharacter").onclick=()=>{renderPicker();openOverlay("pickerOverlay")};
-$("newChat").onclick=()=>{activeCharacter=null;activeChatId=null;$("messageInput").disabled=true;$("sendButton").disabled=true;$("messageInput").placeholder="Choose a character to start chatting…";$("messages").hidden=true;$("welcome").hidden=false;$("welcomeTitle").textContent="A conversation that feels like yours.";$("welcomeText").textContent="Choose a character to begin. Each character has a separate conversation, so you can pick up where you left off.";$("topName").textContent="Choose a character";$("topSub").textContent="Start a new conversation";$("topAvatar").textContent="✦";$("welcomeAvatar").textContent="✦";renderHistory();renderPicker();openOverlay("pickerOverlay")};
-$("sendButton").onclick=()=>sendMessage($("messageInput").value);
-$("messageInput").addEventListener("input",resizeInput);
-$("messageInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage($("messageInput").value)}});
-$("micButton").onclick=startMic;$("voicePill").onclick=toggleVoice;$("voiceToggle").onclick=toggleVoice;
-$("clearChat").onclick=()=>{const chat=currentChat();if(!chat)return;if(!confirm("Clear messages in this conversation?"))return;chat.messages=[];save();renderMessages();toast("Conversation cleared")};
-$("aboutButton").onclick=()=>openOverlay("aboutOverlay");
-function setTheme(theme){document.body.dataset.theme=theme;const light=theme==="light";$("themeToggle").textContent=light?"☾":"☼";$("themeToggle").title=light?"Switch to dark mode":"Switch to light mode";$("themeToggle").setAttribute("aria-label",$("themeToggle").title);try{localStorage.setItem("companion_theme",theme)}catch{}}
-$("themeToggle").onclick=()=>setTheme(document.body.dataset.theme==="light"?"dark":"light");
-let savedTheme="dark";try{savedTheme=localStorage.getItem("companion_theme")||"dark"}catch{}setTheme(savedTheme);
-$("characterSearch").addEventListener("input",renderPicker);
-document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{group=b.dataset.group;document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t===b));renderPicker()});
-document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
-document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>closeOverlay(b.dataset.close));
-document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)closeOverlay(o.id)}));
-document.querySelectorAll(".suggestion").forEach(b=>b.onclick=()=>{if(!activeCharacter){renderPicker();openOverlay("pickerOverlay");return}sendMessage(b.dataset.prompt)});
-renderHistory();
-if(chats.length){const latest=chats[0];activeChatId=latest.id;activeCharacter=characters.find(x=>x.name===latest.character)||{name:latest.character,anime:"Character"};mode=latest.mode||"Conversation";updateHeader();renderMessages();setModeButtons();$("messageInput").disabled=false;$("sendButton").disabled=false;$("messageInput").placeholder="Message "+latest.character+"…"}
+const $=id=>document.getElementById(id);let group="Girls",activeCharacter=null,activeChatId=null,mode="Conversation",voiceOn=false,recognition=null,listening=false,studyTab="quiz",quizState=null,flashIndex=0,flashBack=false;
+function load(key,fallback){try{return JSON.parse(localStorage.getItem(key)||"null")??fallback}catch{return fallback}}
+let chats=load("companion_chats_v3",load("companion_chats_v2",[]));let studySets=load("companion_study_sets_v1",[]);
+function persist(){try{localStorage.setItem("companion_chats_v3",JSON.stringify(chats));localStorage.setItem("companion_study_sets_v1",JSON.stringify(studySets))}catch{toast("Browser storage is full. Export your data before continuing.")}}
+function toast(s){$("toast").textContent=s;$("toast").classList.add("show");clearTimeout(toast.timer);toast.timer=setTimeout(()=>$("toast").classList.remove("show"),2500)}
+function initials(n){return n.split(" ").map(x=>x[0]).slice(0,2).join("")}
+function chatNow(){return chats.find(c=>c.id===activeChatId)}
+function open(id){$(id).classList.add("open")}function close(id){$(id).classList.remove("open")}
+const portraitCache=load("companion_portraits_v1",{});const queue=[];let busy=false;
+async function getPortrait(p){try{let r=await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query:"query ($search: String) { Character(search: $search) { image { large } } }",variables:{search:p.query||p.name}})});if(r.ok){let d=await r.json();if(d.data?.Character?.image?.large)return d.data.Character.image.large}}catch(e){}try{let r=await fetch("https://api.jikan.moe/v4/characters?q="+encodeURIComponent(p.query||p.name)+"&limit=5");if(r.ok){let d=await r.json(),a=d.data||[],n=(p.query||p.name).toLowerCase().replace(/[^a-z0-9]/g,""),m=a.find(x=>(x.name||"").toLowerCase().replace(/[^a-z0-9]/g,"")===n)||a[0];return m?.images?.webp?.image_url||m?.images?.jpg?.image_url||""}}catch(e){}return ""}
+function setAvatar(el,p){el.innerHTML="";let f=document.createElement("span");f.textContent=initials(p.name);let img=document.createElement("img");img.alt=p.name+" portrait";img.hidden=true;img.onerror=()=>{img.hidden=true;f.hidden=false};el.append(img,f);if(portraitCache[p.name]){img.src=portraitCache[p.name];img.hidden=false;f.hidden=true}else{queue.push({p,img,f});processQueue()}}
+async function processQueue(){if(busy)return;busy=true;while(queue.length){let {p,img,f}=queue.shift();if(!portraitCache[p.name]){let u=await getPortrait(p);if(u){portraitCache[p.name]=u;try{localStorage.setItem("companion_portraits_v1",JSON.stringify(portraitCache))}catch{}}}if(portraitCache[p.name]&&img.isConnected){img.src=portraitCache[p.name];img.hidden=false;f.hidden=true}await new Promise(r=>setTimeout(r,650))}busy=false}
+function renderPicker(){let q=$("characterSearch").value.toLowerCase(),grid=$("characterGrid");grid.innerHTML="";characters.filter(p=>p.group===group&&(!q||(p.name+" "+p.anime).toLowerCase().includes(q))).forEach(p=>{let b=document.createElement("button");b.className="character-card";let img=document.createElement("img");img.alt=p.name+" portrait";img.hidden=true;let f=document.createElement("div");f.className="portrait-fallback";f.textContent=initials(p.name);if(portraitCache[p.name]){img.src=portraitCache[p.name];img.hidden=false;f.hidden=true}else{queue.push({p,img,f});processQueue()}img.onerror=()=>{img.hidden=true;f.hidden=false};let n=document.createElement("strong");n.textContent=p.name;let a=document.createElement("small");a.textContent=p.anime;b.append(img,f,n,a);b.onclick=()=>choose(p.name);grid.append(b)})}
+function choose(name){let p=characters.find(x=>x.name===name);if(!p)return;activeCharacter=p;let c=chats.find(x=>x.character===name);if(!c){c={id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),character:name,title:"",mode:"Conversation",messages:[],updated:Date.now()};chats.unshift(c)}activeChatId=c.id;mode=c.mode||"Conversation";persist();updateHeader();renderMessages();renderHistory();setModes();$("messageInput").disabled=false;$("sendButton").disabled=false;$("messageInput").placeholder="Message "+name+"…";$("welcomeTitle").textContent="Say hello to "+name+"."; $("welcomeText").textContent=p.bio;setAvatar($("welcomeAvatar"),p);close("pickerOverlay");$("sidebar").classList.remove("open")}
+function updateHeader(){if(!activeCharacter)return;$("topName").textContent=activeCharacter.name;$("topSub").textContent=activeCharacter.anime;setAvatar($("topAvatar"),activeCharacter);setAvatar($("welcomeAvatar"),activeCharacter)}
+function renderHistory(){let el=$("history"),q=$("historySearch").value.toLowerCase();el.innerHTML="";let list=chats.filter(c=>(c.character+" "+(c.title||"")).toLowerCase().includes(q)).slice(0,50);if(!list.length){el.innerHTML='<div class="empty-history">No matching conversations yet.</div>';return}list.forEach(c=>{let b=document.createElement("button");b.className="history-item"+(c.id===activeChatId?" active":"");let d=document.createElement("span");d.className="hist-dot";let n=document.createElement("span");n.className="hist-name";n.textContent=c.title||c.character;let more=document.createElement("span");more.className="more";more.textContent="⋯";b.append(d,n,more);b.onclick=()=>activateChat(c.id);more.onclick=e=>{e.stopPropagation();activateChat(c.id);open("optionsOverlay")};el.append(b)})}
+function activateChat(id){let c=chats.find(x=>x.id===id);if(!c)return;activeChatId=id;activeCharacter=characters.find(p=>p.name===c.character)||{name:c.character,anime:"Character",bio:"A saved conversation."};mode=c.mode||"Conversation";updateHeader();renderMessages();renderHistory();setModes();$("messageInput").disabled=false;$("sendButton").disabled=false;$("messageInput").placeholder="Message "+c.character+"…";$("sidebar").classList.remove("open")}
+function renderMessages(){let c=chatNow(),el=$("messages");if(!c||!c.messages.length){el.hidden=true;$("welcome").hidden=false;return}$("welcome").hidden=true;el.hidden=false;el.innerHTML="";c.messages.forEach((m,i)=>{let w=document.createElement("div");w.className="message "+(m.role==="user"?"user":"assistant");if(m.role!=="user"){let s=document.createElement("div");s.className="speaker";s.textContent=c.character;w.append(s)}let t=document.createElement("div");t.className="msgtext";t.textContent=m.text;w.append(t);let actions=document.createElement("div");actions.className="msg-actions";let add=(label,fn)=>{let b=document.createElement("button");b.textContent=label;b.onclick=fn;actions.append(b)};add("Copy",()=>{navigator.clipboard?.writeText(m.text).then(()=>toast("Copied")).catch(()=>toast("Clipboard unavailable"))});if(m.role==="user")add("Edit",()=>editMessage(i));else{add("Read aloud",()=>speak(m.text));add("Regenerate",()=>regenerate(i))}add("Delete",()=>deleteMessage(i));w.append(actions);el.append(w)});el.scrollTop=el.scrollHeight}
+function editMessage(i){let c=chatNow(),m=c?.messages[i];if(!m||m.role!=="user")return;let v=prompt("Edit your message:",m.text);if(v===null||!v.trim())return;c.messages=c.messages.slice(0,i);c.messages.push({role:"user",text:v.trim(),at:Date.now()});persist();renderMessages();sendMessage(v.trim(),true)}
+function deleteMessage(i){let c=chatNow();if(!c)return;c.messages.splice(i,1);persist();renderMessages();toast("Message deleted")}
+function regenerate(i){let c=chatNow();if(!c||c.messages[i]?.role!=="assistant")return;let prev=c.messages.slice(0,i).reverse().find(x=>x.role==="user");if(!prev)return;c.messages=c.messages.slice(0,i);persist();renderMessages();sendMessage(prev.text,true)}
+function setModes(){document.querySelectorAll(".mode").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode))}
+function setMode(m){mode=m;let c=chatNow();if(c){c.mode=m;persist()}setModes();toast(m+" mode selected")}
+function demoReply(text,person,m){let prefix={Conversation:"",Study:"Let's approach this like a study session. ",Learning:"Let's break the idea into clear steps. ",Productivity:"Let's turn that into a manageable plan. ",Entertainment:"Let's make this fun. ",Gaming:"Game time! "}[m]||"";let voice={ "Mai Sakurajima":"Mai: ", "Ichika Nakano":"Ichika: ", "Nino Nakano":"Nino: ", "Miku Nakano":"Miku: ", "Yotsuba Nakano":"Yotsuba: ", "Itsuki Nakano":"Itsuki: ", "Akari Watanabe":"Akari: ", "Marin Kitagawa":"Marin: ", "Zero Two":"Zero Two: ", "Alya":"Alya: ", "Satoru Gojo":"Gojo: ", "Ryomen Sukuna":"Sukuna: ", "Kakashi Hatake":"Kakashi: ", "Might Guy":"Guy: ", "Escanor":"Escanor: ", "Goku":"Goku: ", "Izuku Midoriya":"Midoriya: ", "Edward Elric":"Edward: "}[person]||person+": ";let body=m==="Study"?"Tell me the exact topic or question, and we can organize what you already know.":m==="Learning"?"Start with one question: what part do you want to understand first?":m==="Productivity"?"Write down the goal, the deadline, and the first small step. What are you working toward?":m==="Gaming"?"Pick a quick game: 20 questions, trivia, or word association.":m==="Entertainment"?"We could talk about a show, invent a story idea, or try a creative challenge.":"Thanks for telling me. What would you like to explore next?";return voice+prefix+body+"\n\n— Demo response. AI is not connected yet, so this is a sample interaction, not an AI-generated answer."}
+function sendMessage(text,skipUser=false){let clean=text.trim(),c=chatNow();if(!clean||!c)return;let p=c.character,m=c.mode||mode;if(!skipUser)c.messages.push({role:"user",text:clean,at:Date.now()});if(!c.title&&c.messages.filter(x=>x.role==="user").length===1)c.title=clean.slice(0,34)+(clean.length>34?"…":"");c.updated=Date.now();persist();$("messageInput").value="";resize();renderMessages();renderHistory();let pending=document.createElement("div");pending.className="typing";pending.textContent=p+" is preparing a demo reply…";if(activeChatId===c.id){$("messages").append(pending);$("messages").scrollTop=$("messages").scrollHeight}setTimeout(()=>{pending.remove();c.messages.push({role:"assistant",text:demoReply(clean,p,m),at:Date.now()});c.updated=Date.now();persist();if(activeChatId===c.id){renderMessages();renderHistory();if(voiceOn)speak(c.messages.at(-1).text)}else renderHistory()},450)}
+function resize(){let x=$("messageInput");x.style.height="auto";x.style.height=Math.min(x.scrollHeight,135)+"px"}
+function speak(s){if(!("speechSynthesis"in window)){toast("Read-aloud is not supported in this browser.");return}speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(s);u.rate=1;speechSynthesis.speak(u)}
+function toggleVoice(){voiceOn=!voiceOn;$("voiceToggle").textContent="◖  Read-aloud: "+(voiceOn?"on":"off");toast("Read-aloud "+(voiceOn?"on":"off"))}
+function mic(){let SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast("Voice input is not supported in this browser.");return}if(listening){recognition.stop();return}recognition=new SR();recognition.lang="en-US";recognition.interimResults=false;recognition.onstart=()=>{listening=true;$("micButton").classList.add("listening")};recognition.onend=()=>{listening=false;$("micButton").classList.remove("listening")};recognition.onerror=()=>toast("Voice input did not work. Try again.");recognition.onresult=e=>{$("messageInput").value+=($("messageInput").value?" ":"")+e.results[0][0].transcript;resize()};recognition.start()}
+function profile(){if(!activeCharacter){toast("Choose a character first.");return}let p=activeCharacter;$("profilePanel").innerHTML="";let hero=document.createElement("div");hero.className="profile-hero";let av=document.createElement("div");av.className="avatar";setAvatar(av,p);let info=document.createElement("div");let h=document.createElement("h3");h.textContent=p.name;let sub=document.createElement("p");sub.textContent=p.anime;info.append(h,sub);hero.append(av,info);let box=document.createElement("div");box.className="profile-summary";let bio=document.createElement("p");bio.textContent=p.bio;let note=document.createElement("p");note.textContent="Profile describes a fan-made chat portrayal. No AI personality engine is connected.";box.append(bio,note);$("profilePanel").append(hero,box);open("profileOverlay")}
+function newChat(){activeCharacter=null;activeChatId=null;$("messageInput").disabled=true;$("sendButton").disabled=true;$("messageInput").placeholder="Choose a character to start chatting…";$("messages").hidden=true;$("welcome").hidden=false;$("welcomeTitle").textContent="A space to chat, learn, and create.";$("welcomeText").textContent="Choose a character to start. Your conversations stay separate, and the study tools work right in your browser.";$("topName").textContent="Choose a character";$("topSub").textContent="Start a new conversation";$("topAvatar").textContent="✦";$("welcomeAvatar").textContent="✦";renderHistory();renderPicker();open("pickerOverlay")}
+function chatExport(){let c=chatNow();if(!c)return;download(JSON.stringify(c,null,2),(c.title||c.character)+".json","application/json")}
+function download(data,name,type){let a=document.createElement("a"),u=URL.createObjectURL(new Blob([data],{type}));a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
+function openStudy(tab="quiz"){studyTab=tab;renderStudy();open("studyOverlay")}
+function renderStudy(){document.querySelectorAll("[data-study]").forEach(b=>b.classList.toggle("active",b.dataset.study===studyTab));let el=$("studyBody");el.innerHTML="";if(studyTab==="quiz")renderQuiz(el);if(studyTab==="practice")renderPractice(el);if(studyTab==="flashcards")renderFlashcards(el);if(studyTab==="notes")renderNotes(el)}
+function renderQuiz(el){el.innerHTML='<p class="study-intro">Create a quick multiple-choice quiz from a topic you enter. Questions are locally generated templates, not AI-generated or curriculum-verified.</p><label class="field"><span>Topic</span><input id="quizTopic" placeholder="e.g. cellular respiration"></label><label class="field"><span>Number of questions</span><select id="quizCount"><option>5</option><option>8</option><option>10</option></select></label><button class="primary" id="makeQuiz">Create quiz</button><div id="quizArea"></div>'; $("makeQuiz").onclick=()=>{let topic=$("quizTopic").value.trim();if(!topic){toast("Enter a topic first.");return}let count=+$("quizCount").value;quizState={topic,questions:Array.from({length:count},(_,i)=>({q:i===0?"Which statement best describes "+topic+"?": "Which is the best next step when studying "+topic+"?",opts:["Identify the key idea and explain it in your own words","Memorize unrelated details","Skip the examples","Assume every source says the same thing"],a:0,why:"A strong approach is to identify the central idea, connect it to evidence or examples, and explain it clearly."})),index:0,score:0,answers:[]};showQuiz()}}
+function showQuiz(){let area=$("quizArea");if(!quizState)return;if(quizState.index>=quizState.questions.length){area.innerHTML='<div class="study-card"><h3>Quiz complete</h3><p>You selected the strongest study approach '+quizState.score+' out of '+quizState.questions.length+' times.</p><p class="study-intro">This template quiz checks general study reasoning, not detailed subject knowledge.</p><button class="primary" id="againQuiz">Create another quiz</button></div>';$("againQuiz").onclick=()=>renderStudy();return}let q=quizState.questions[quizState.index];area.innerHTML='<div class="study-card"><p class="study-intro">Question '+(quizState.index+1)+' of '+quizState.questions.length+'</p><h3></h3><div class="answer-list" id="quizOptions"></div><div id="quizFeedback"></div><div class="modal-actions"><button class="primary" id="nextQuiz" disabled>Next question</button></div></div>';area.querySelector("h3").textContent=q.q;let opts=$("quizOptions");q.opts.forEach((o,i)=>{let b=document.createElement("button");b.className="answer-option";b.textContent=o;b.onclick=()=>{if(quizState.answers[quizState.index]!==undefined)return;quizState.answers[quizState.index]=i;if(i===q.a)quizState.score++;opts.querySelectorAll("button").forEach((x,j)=>{x.disabled=true;if(j===q.a)x.classList.add("selected")});$("quizFeedback").innerHTML='<div class="feedback">'+(i===q.a?"Correct — ":"Not quite. ")+q.why+'</div>';$("nextQuiz").disabled=false};opts.append(b)});$("nextQuiz").onclick=()=>{quizState.index++;showQuiz()}}
+function renderPractice(el){el.innerHTML='<p class="study-intro">A simple one-question-at-a-time practice prompt. Type your answer, then compare it with a useful checklist.</p><label class="field"><span>Topic or skill</span><input id="practiceTopic" placeholder="e.g. causes of imperialism"></label><button class="primary" id="startPractice">Start practice</button><div id="practiceArea"></div>';$("startPractice").onclick=()=>{let t=$("practiceTopic").value.trim();if(!t){toast("Enter a topic first.");return}$("practiceArea").innerHTML='<div class="study-card"><h3>Explain this in your own words:</h3><p></p><label class="field"><span>Your answer</span><textarea id="practiceAnswer" placeholder="Write what you know…"></textarea></label><button class="primary" id="checkPractice">Review my answer</button><div id="practiceFeedback"></div></div>';$("practiceArea").querySelector("p").textContent="What is one important idea about "+t+", and why does it matter?";$("checkPractice").onclick=()=>{let a=$("practiceAnswer").value.trim();if(!a){toast("Write an answer first.");return}$("practiceFeedback").innerHTML='<div class="feedback"><strong>Self-check:</strong> Did you define the idea, include a specific detail or example, and explain why it matters? This browser-only tool cannot reliably grade subject accuracy without AI or an answer key.</div>'}}}
+function renderFlashcards(el){el.innerHTML='<p class="study-intro">Make your own flashcards and flip through them. Cards are saved in this browser.</p><label class="field"><span>Front / question</span><input id="cardFront" placeholder="Term or question"></label><label class="field"><span>Back / answer</span><textarea id="cardBack" placeholder="Definition or explanation"></textarea></label><button class="primary" id="addCard">Save flashcard</button><div id="flashArea"></div>'; $("addCard").onclick=()=>{let f=$("cardFront").value.trim(),b=$("cardBack").value.trim();if(!f||!b){toast("Add both a front and a back.");return}studySets.push({front:f,back:b});persist();flashIndex=studySets.length-1;flashBack=false;renderFlashcards($("studyBody"))};let area=$("flashArea");if(!studySets.length){area.innerHTML='<p class="study-intro">No cards yet. Add your first one above.</p>';return}flashIndex=Math.min(flashIndex,studySets.length-1);let card=document.createElement("div");card.className="study-card flashcard";let p=document.createElement("div");p.textContent=flashBack?studySets[flashIndex].back:studySets[flashIndex].front;let small=document.createElement("small");small.textContent="Click card to flip · "+(flashIndex+1)+" of "+studySets.length; p.append(small);card.append(p);card.onclick=()=>{flashBack=!flashBack;renderFlashcards($("studyBody"))};area.append(card);let actions=document.createElement("div");actions.className="modal-actions";let prev=document.createElement("button");prev.className="secondary";prev.textContent="Previous";prev.onclick=()=>{flashIndex=(flashIndex-1+studySets.length)%studySets.length;flashBack=false;renderFlashcards($("studyBody"))};let next=document.createElement("button");next.className="secondary";next.textContent="Next";next.onclick=()=>{flashIndex=(flashIndex+1)%studySets.length;flashBack=false;renderFlashcards($("studyBody"))};let del=document.createElement("button");del.className="secondary";del.textContent="Delete card";del.onclick=()=>{studySets.splice(flashIndex,1);persist();renderFlashcards($("studyBody"))};actions.append(prev,next,del);area.append(actions)}
+function renderNotes(el){el.innerHTML='<p class="study-intro">Paste notes to make a clean outline, key-term list, and review checklist. Processing stays in your browser.</p><label class="field"><span>Paste your notes</span><textarea id="notesInput" placeholder="Paste class notes here…"></textarea></label><button class="primary" id="organizeNotes">Organize notes</button><div id="notesResult"></div>';$("organizeNotes").onclick=()=>{let raw=$("notesInput").value.trim();if(!raw){toast("Paste some notes first.");return}let lines=raw.split(/\n+/).map(x=>x.trim()).filter(Boolean),words=raw.match(/[A-Za-z][A-Za-z'-]{4,}/g)||[],freq={};words.forEach(w=>{let k=w.toLowerCase();freq[k]=(freq[k]||0)+1});let terms=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,8).map(x=>x[0]);let out=$("notesResult");out.innerHTML="";let card=document.createElement("div");card.className="study-card";let h=document.createElement("h3");h.textContent="Organized outline";let ul=document.createElement("ul");lines.slice(0,30).forEach(x=>{let li=document.createElement("li");li.textContent=x.replace(/^[-•*]\s*/,"");ul.append(li)});let h2=document.createElement("h3");h2.textContent="Repeated key terms";let p=document.createElement("p");p.textContent=terms.length?terms.join(" · "):"No repeated terms found.";let h3=document.createElement("h3");h3.textContent="Review checklist";let p2=document.createElement("p");p2.textContent="Can you explain each bullet without looking? Can you connect the ideas? Can you give one example?";card.append(h,ul,h2,p,h3,p2);out.append(card);let copy=document.createElement("button");copy.className="secondary";copy.textContent="Copy organized notes";copy.onclick=()=>navigator.clipboard?.writeText(lines.map(x=>"• "+x).join("\n")+"\n\nKey terms: "+terms.join(", ")).then(()=>toast("Copied")).catch(()=>toast("Clipboard unavailable"));out.append(copy)}}
+function setTheme(t){document.body.dataset.theme=t;try{localStorage.setItem("companion_theme",t)}catch{}$("themeToggle").textContent=t==="light"?"☾":"☼"}
+function exportAll(){download(JSON.stringify({chats,studySets,theme:load("companion_theme","dark")},null,2),"companion-data.json","application/json")}
+$("pickCharacter").onclick=()=>{renderPicker();open("pickerOverlay")};$("newChat").onclick=newChat;$("sendButton").onclick=()=>sendMessage($("messageInput").value);$("messageInput").addEventListener("input",resize);$("messageInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage($("messageInput").value)}});$("micButton").onclick=mic;$("voiceToggle").onclick=toggleVoice;$("profileButton").onclick=profile;$("studyOpen").onclick=()=>openStudy();$("aboutButton").onclick=()=>open("aboutOverlay");$("themeToggle").onclick=()=>setTheme(document.body.dataset.theme==="light"?"dark":"light");$("themeSide").onclick=()=>$("themeToggle").click();$("menuButton").onclick=()=>$("sidebar").classList.toggle("open");$("chatMenu").onclick=()=>{if(!chatNow()){toast("Choose a conversation first.");return}open("optionsOverlay")};$("historySearch").oninput=renderHistory;$("characterSearch").oninput=renderPicker;
+$("clearChat").onclick=()=>{let c=chatNow();if(!c)return;if(confirm("Clear messages in this conversation?")){c.messages=[];persist();renderMessages();close("optionsOverlay");toast("Messages cleared")}};$("renameChat").onclick=()=>{let c=chatNow();if(!c)return;let v=prompt("Conversation name:",c.title||c.character);if(v&&v.trim()){c.title=v.trim();persist();renderHistory();close("optionsOverlay")}};$("deleteChat").onclick=()=>{let c=chatNow();if(!c||!confirm("Delete this conversation permanently from this browser?"))return;chats=chats.filter(x=>x.id!==c.id);activeChatId=null;activeCharacter=null;persist();newChat();close("optionsOverlay");toast("Conversation deleted")};$("exportChat").onclick=chatExport;$("exportData").onclick=exportAll;$("deleteAllData").onclick=()=>{if(!confirm("Delete all conversations, flashcards, and saved preferences from this browser? This cannot be undone."))return;localStorage.removeItem("companion_chats_v3");localStorage.removeItem("companion_chats_v2");localStorage.removeItem("companion_study_sets_v1");chats=[];studySets=[];activeChatId=null;activeCharacter=null;newChat();close("aboutOverlay");toast("Local data deleted")};
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>close(b.dataset.close));document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)close(o.id)}));document.querySelectorAll(".tab[data-group]").forEach(b=>b.onclick=()=>{group=b.dataset.group;document.querySelectorAll(".tab[data-group]").forEach(x=>x.classList.toggle("active",x===b));renderPicker()});document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>setMode(b.dataset.mode));document.querySelectorAll(".suggestion").forEach(b=>b.onclick=()=>{if(b.dataset.action==="study"){openStudy();return}if(!activeCharacter){newChat();return}sendMessage(b.dataset.prompt)});document.querySelectorAll("[data-study]").forEach(b=>b.onclick=()=>{studyTab=b.dataset.study;renderStudy()});
+let theme=load("companion_theme","dark");setTheme(theme);renderHistory();if(chats.length)activateChat(chats.slice().sort((a,b)=>(b.updated||0)-(a.updated||0))[0].id);
 </script>
-</body>
-</html>
+</body></html>
