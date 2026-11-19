@@ -4,6 +4,7 @@ const ALLOWED_ORIGINS = new Set([
   "http://127.0.0.1:5500"
 ]);
 const MODEL = "@cf/zai-org/glm-4.7-flash";
+const TTS_MODEL = "@cf/deepgram/aura-2-en";
 const hits = new Map();
 
 function json(data, status = 200, origin = "") {
@@ -64,7 +65,7 @@ export default {
     if (request.method === "GET" && url.pathname === "/health") {
       return json({ ok: true, service: "companion-ai", model: MODEL }, 200, origin);
     }
-    if (request.method !== "POST" || !["/chat", "/lesson"].includes(url.pathname)) {
+    if (request.method !== "POST" || !["/chat", "/lesson", "/speak"].includes(url.pathname)) {
       return json({ error: "Not found." }, 404, origin);
     }
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
@@ -80,6 +81,29 @@ export default {
     catch { return json({ error: "Invalid JSON request." }, 400, origin); }
 
     try {
+      if (url.pathname === "/speak") {
+        const speechText = cleanText(body.text, 1800);
+        const allowedSpeakers = new Set(["amalthea","andromeda","apollo","arcas","aries","asteria","athena","atlas","aurora","callista","cora","cordelia","delia","draco","electra","harmonia","helena","hera","hermes","hyperion","iris","janus","juno","jupiter","luna","mars","minerva","neptune","odysseus","ophelia","orion","orpheus","pandora","phoebe","pluto","saturn","thalia","theia","vesta","zeus"]);
+        const speaker = cleanText(body.speaker, 24).toLowerCase();
+        if (!speechText) return json({ error: "Add text to speak." }, 400, origin);
+        if (!allowedSpeakers.has(speaker)) return json({ error: "Choose a supported voice." }, 400, origin);
+        const audio = await env.AI.run(TTS_MODEL, { text: speechText, speaker, encoding: "mp3" });
+        const stream = audio?.audio || audio;
+        if (!stream || (typeof stream !== "object" && !(stream instanceof ArrayBuffer))) {
+          return json({ error: "The voice model returned no audio. Try again." }, 502, origin);
+        }
+        return new Response(stream, {
+          status: 200,
+          headers: {
+            "content-type": "audio/mpeg",
+            "cache-control": "no-store",
+            "access-control-allow-origin": origin,
+            "access-control-allow-methods": "POST, GET, OPTIONS",
+            "access-control-allow-headers": "Content-Type",
+            "vary": "Origin"
+          }
+        });
+      }
       if (url.pathname === "/chat") {
         const character = body.character || {};
         const name = cleanText(character.name, 80) || "Companion";
@@ -117,6 +141,10 @@ export default {
 
       const topic = cleanText(body.topic, 180);
       const notes = cleanText(body.notes, 6500);
+      const teacher = body.character || {};
+      const teacherName = cleanText(teacher.name, 80);
+      const teacherAnime = cleanText(teacher.anime, 100);
+      const teacherBio = cleanText(teacher.bio, 450);
       const lengthChoice = [3, 4, 5, 6].includes(Number(body.slides)) ? Number(body.slides) : 4;
       if (!topic) return json({ error: "Add a topic for the lesson." }, 400, origin);
       const prompt = [
@@ -127,6 +155,8 @@ export default {
         "]}.",
         "Create exactly " + lengthChoice + " slides. Keep each narration under 65 words and each slide to 2 or 3 bullets.",
         "Explain concepts in a logical sequence, define important vocabulary, and finish with a short recap.",
+        teacherName ? "Presenter: " + teacherName + (teacherAnime ? " from " + teacherAnime : "") + ". Write the narration in a natural teaching style that fits this character's described personality, without imitating an actor." : "Presenter: a friendly study guide.",
+        teacherBio ? "Presenter personality: " + teacherBio : "",
         "Do not include markdown fences or any text outside the JSON.",
         "Topic: " + topic,
         notes ? "Student notes (use as source material, correct obvious errors carefully):\n" + notes : "No class notes were provided. Use established general knowledge."
