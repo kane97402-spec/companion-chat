@@ -105,7 +105,7 @@ body[data-theme="light"] .character-quickbar{background:#fff;border-color:var(--
  <section class="content" id="content">
   <div class="welcome" id="welcome"><h1 id="welcomeTitle">A space to chat, learn, and create.</h1><p id="welcomeText">Choose a character to start. Your conversations stay separate, and the study tools work right in your browser.</p><div class="suggestions"><button class="suggestion" data-prompt="Tell me about yourself.">Meet your companion</button><button class="suggestion" data-prompt="Help me understand a topic I'm studying.">Start a study chat</button><button class="suggestion" data-action="study">Open study workspace</button></div><div class="home-dashboard"><button class="home-tile featured" data-action="study"><span class="tile-kicker">Your learning space</span><span class="tile-icon">✧</span><strong>Make progress on what you're learning</strong><small>Build quizzes, review flashcards, practice a topic, or organize your notes.</small></button><button class="home-tile" data-action="characters"><span class="tile-kicker">Find your voice</span><span class="tile-icon">◉</span><strong>Choose a character</strong><small>Browse anime companions and start a conversation.</small></button><button class="home-tile" data-action="recent"><span class="tile-kicker">Pick up where you left off</span><span class="tile-icon">↗</span><strong>Recent conversations</strong><small>Jump back into a chat you've already started.</small></button></div><div class="home-section-head"><strong>Recently active characters</strong><span>Quick access</span></div><div class="recent-character-row" id="recentCharacters"><span class="study-intro">Your characters will appear here as you chat.</span></div></div>
   <div class="messages" id="messages" hidden></div>
-  <div class="composer-wrap"><div class="mode-strip" id="modeStrip"><button class="mode active" data-mode="Conversation">◉ Conversation</button><button class="mode" data-mode="Study">▤ Study</button><button class="mode" data-mode="Entertainment">✧ Entertainment</button><button class="mode" data-mode="Productivity">✓ Productivity</button><button class="mode" data-mode="Learning">⌘ Learning</button><button class="mode" data-mode="Gaming">♟ Gaming</button></div><div class="composer"><button class="attach" id="attachButton" type="button" title="Attach files or pictures" aria-label="Attach files or pictures">＋</button><input id="fileInput" type="file" accept="image/*,.pdf,.txt,.doc,.docx,.ppt,.pptx,.xls,.xlsx" multiple hidden><textarea id="messageInput" rows="1" placeholder="Choose a character to start chatting…" disabled></textarea><button class="mic" id="micButton" title="Voice input" aria-label="Voice input">♩</button><button class="send" id="sendButton" disabled aria-label="Send message">↑</button></div><div class="attachment-list" id="attachmentList" aria-live="polite"></div><div class="footnote" id="footnote">Demo chat only — no AI service is connected. Study tools run locally in your browser.</div></div>
+  <div class="composer-wrap"><div class="mode-strip" id="modeStrip"><button class="mode active" data-mode="Conversation">◉ Conversation</button><button class="mode" data-mode="Study">▤ Study</button><button class="mode" data-mode="Entertainment">✧ Entertainment</button><button class="mode" data-mode="Productivity">✓ Productivity</button><button class="mode" data-mode="Learning">⌘ Learning</button><button class="mode" data-mode="Gaming">♟ Gaming</button></div><div class="composer"><button class="attach" id="attachButton" type="button" title="Attach files or pictures" aria-label="Attach files or pictures">＋</button><input id="fileInput" type="file" accept="image/*,.pdf,.txt,.doc,.docx,.ppt,.pptx,.xls,.xlsx" multiple hidden><textarea id="messageInput" rows="1" placeholder="Choose a character to start chatting…" disabled></textarea><button class="mic" id="micButton" title="Voice input" aria-label="Voice input">🎙</button><button class="send" id="sendButton" disabled aria-label="Send message">↑</button></div><div class="attachment-list" id="attachmentList" aria-live="polite"></div><div class="footnote" id="footnote">Demo chat only — no AI service is connected. Study tools run locally in your browser.</div></div>
  </section>
 </main>
 </div>
@@ -276,6 +276,40 @@ body[data-theme="light"] .attachment-chip{background:#f6f2fb;color:#514064;borde
     margin:auto;
   }
   .content.chat-start .mode-strip{justify-content:center}
+}
+
+
+/* Final polish: softer composer, outlined mode selector, quiet attach control */
+.content.chat-start .composer{border-radius:24px}
+.content.chat-start .mode-strip{
+  width:max-content;
+  max-width:100%;
+  align-self:center;
+  padding:5px 8px;
+  margin:0 auto 8px;
+  gap:4px;
+  border:1px solid #51465f;
+  border-radius:999px;
+  background:#1b1922a8;
+}
+.content.chat-start .mode{
+  padding:4px 9px;
+  border:0;
+  border-radius:999px;
+}
+.content.chat-start .mode.active{
+  background:#332a43;
+  color:#eee6ff;
+  border:0;
+}
+.content.chat-start .attach{
+  border:0;
+  background:transparent;
+  color:#cdb9f1;
+}
+.content.chat-start .attach:hover{
+  border:0;
+  background:#ffffff0c;
 }
 
 </style>
