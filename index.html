@@ -144,6 +144,12 @@ body[data-theme="light"] .character-quickbar{background:#fff;border-color:var(--
 body[data-theme="light"] .lesson-presenter{border-color:#d8cce8;background:#ffffff99}
 @media(max-width:560px){.voice-preview-row{align-items:flex-start;flex-direction:column}.lesson-presenter{padding:11px}.lesson-presenter-avatar{width:58px;height:58px;flex-basis:58px}}
 
+
+/* Video export: styles are scoped to the Study Center lesson player only. */
+.video-export-status{min-height:18px;margin:8px 0 0;color:var(--muted);font-size:11px}
+.lesson-export-button{white-space:nowrap}
+.lesson-player .lesson-controls{align-items:center}
+@media(max-width:560px){.lesson-player .lesson-controls button{flex:1 1 auto}}
 </style>
 </head>
 <body>
@@ -416,7 +422,7 @@ function defaultLessonVoice(name){
 }
 function renderVideo(el){
  const options=lessonVoiceOptions.map(v=>'<option value="'+v.value+'">'+v.label+'</option>').join("");
- el.innerHTML='<p class="study-intro">Create a narrated anime-style study lesson. Your selected character becomes the teacher, with an original AI voice and an animated presenter. Free Cloudflare AI usage limits apply.</p><label class="field"><span>Lesson topic</span><input id="videoTopic" placeholder="e.g. Cellular respiration"></label><label class="field"><span>Class notes (optional)</span><textarea id="videoNotes" placeholder="Paste notes or key ideas to guide the lesson…"></textarea></label><label class="field"><span>Lesson length</span><select id="videoSlides"><option value="3">Quick · 3 scenes</option><option value="4" selected>Standard · 4 scenes</option><option value="5">Detailed · 5 scenes</option><option value="6">Extended · 6 scenes</option></select></label><label class="field"><span>Teacher voice</span><select id="videoVoice">'+options+'</select></label><div class="voice-preview-row"><span class="study-intro">Choose a voice and preview it before generating.</span><button class="secondary" id="previewLessonVoice" type="button">▶ Preview voice</button></div><button class="primary" id="makeVideo">✧ Generate animated lesson</button><div id="videoResult"></div>';
+ el.innerHTML='<p class="study-intro">Create a narrated educational video with your selected character as the presenter, clear diagrams, key points, and downloadable video export. Free Cloudflare AI usage limits apply. Export currently uses WebM format in supported browsers.</p><label class="field"><span>Lesson topic</span><input id="videoTopic" placeholder="e.g. Cellular respiration"></label><label class="field"><span>Class notes (optional)</span><textarea id="videoNotes" placeholder="Paste notes or key ideas to guide the lesson…"></textarea></label><label class="field"><span>Lesson length</span><select id="videoSlides"><option value="3">Quick · 3 scenes</option><option value="4" selected>Standard · 4 scenes</option><option value="5">Detailed · 5 scenes</option><option value="6">Extended · 6 scenes</option></select></label><label class="field"><span>Teacher voice</span><select id="videoVoice">'+options+'</select></label><div class="voice-preview-row"><span class="study-intro">Choose a voice and preview it before generating.</span><button class="secondary" id="previewLessonVoice" type="button">▶ Preview voice</button></div><button class="primary" id="makeVideo">✧ Generate lesson video</button><div id="videoResult"></div>';
  const teacherName=activeCharacter?.name||"companion.";
  const voiceSelect=$("videoVoice");
  voiceSelect.value=lessonVoices[teacherName]||defaultLessonVoice(teacherName);
@@ -504,7 +510,7 @@ function renderLessonSlide(host){
  play.onclick=()=>{if(lessonState.playing){stopLessonPlayback();renderLessonSlide(host)}else{lessonState.playing=true;renderLessonSlide(host);speakLessonSlide(host)}};
  const next=document.createElement("button");next.className="secondary";next.textContent=index===lesson.slides.length-1?"Restart":"Next";
  next.onclick=()=>{stopLessonPlayback();lessonState.index=index===lesson.slides.length-1?0:index+1;renderLessonSlide(host)};
- controls.append(previous,play,next);card.append(top,sub,presenter,title,narration,list,controls);host.append(card);
+ const exportButton=document.createElement("button");exportButton.className="secondary lesson-export-button";exportButton.type="button";exportButton.textContent="↓ Export video";exportButton.onclick=()=>{if(typeof window.exportCompanionLessonVideo==="function")window.exportCompanionLessonVideo(host,exportButton,lessonState);else toast("Video export module did not load. Refresh and try again.")};const exportStatus=document.createElement("p");exportStatus.className="video-export-status";exportStatus.setAttribute("aria-live","polite");exportStatus.textContent="Export creates a narrated 720p video with diagrams and the character presenter.";controls.append(previous,play,next,exportButton);card.append(top,sub,presenter,title,narration,list,controls,exportStatus);lessonState.exportStatus=exportStatus;host.append(card);
 }
 function advanceLessonSlide(host,state){
  if(!lessonState||lessonState!==state||!state.playing)return;
@@ -546,6 +552,7 @@ $("clearChat").onclick=()=>{let c=chatNow();if(!c)return;if(confirm("Clear messa
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>close(b.dataset.close));document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)close(o.id)}));document.querySelectorAll(".tab[data-group]").forEach(b=>b.onclick=()=>{group=b.dataset.group;document.querySelectorAll(".tab[data-group]").forEach(x=>x.classList.toggle("active",x===b));renderPicker()});document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>setMode(b.dataset.mode));document.querySelectorAll(".suggestion").forEach(b=>b.onclick=()=>{if(b.dataset.action==="study"){openStudy();return}if(!activeCharacter){newChat();return}sendMessage(b.dataset.prompt)});document.querySelectorAll(".home-tile").forEach(b=>b.onclick=()=>{if(b.dataset.action==="study")openStudy();if(b.dataset.action==="characters"){renderPicker();open("pickerOverlay")}if(b.dataset.action==="recent"){let ch=chats.slice().sort((a,b)=>(b.updated||0)-(a.updated||0))[0];if(ch)activateChat(ch.id);else{renderPicker();open("pickerOverlay")}}});document.querySelectorAll("[data-study]").forEach(b=>b.onclick=()=>{studyTab=b.dataset.study;renderStudy()});
 let theme=load("companion_theme","dark");setTheme(theme);showHome();renderHistory();renderQuickTabs();
 </script>
+<script src="./video-renderer.js"></script>
 </body></html>
 <style>
 .content.chat-start{justify-content:center}
